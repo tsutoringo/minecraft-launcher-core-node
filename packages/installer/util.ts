@@ -640,7 +640,7 @@ export async function batchedTask(context: Task.Context, tasks: Task<unknown>[],
 
     let errors = [] as unknown[];
     context.update(0, sizes.reduce((a, b) => a + b, 0));
-    await Promise.all(tasks.map((task, index) => context.execute(task, sizes[index]).catch((e) => {
+    await Promise.all(tasks.map((task, index) => context.yield(task, sizes[index]).catch((e) => {
         if (throwErrorImmediately || e instanceof Task.CancelledError) {
             throw e;
         } else {

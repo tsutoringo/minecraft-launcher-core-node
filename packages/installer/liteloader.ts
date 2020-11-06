@@ -188,14 +188,14 @@ export function installTask(versionMeta: Version, location: MinecraftLocation, o
 
         const mountVersion = options.inheritsFrom || versionMeta.mcversion;
 
-        const mountedJSON: any = await context.execute(Task.create("resolveVersionJson", async function resolveVersionJson() {
+        const mountedJSON: any = await context.yield(Task.create("resolveVersionJson", async function resolveVersionJson() {
             if (await missing(mc.getVersionJson(mountVersion))) {
                 throw createErr({ error: "MissingVersionJson", version: mountVersion, path: mc.getVersionJson(mountVersion) });
             }
             return readFile(mc.getVersionJson(mountVersion)).then((b) => b.toString()).then(JSON.parse);
         }), 50);
 
-        const versionInf = await context.execute(Task.create("generateLiteloaderJson", async function generateLiteloaderJson() {
+        const versionInf = await context.yield(Task.create("generateLiteloaderJson", async function generateLiteloaderJson() {
             const inf = buildVersionInfo(versionMeta, mountedJSON);
 
             inf.id = options.versionId || inf.id;

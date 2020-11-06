@@ -121,20 +121,20 @@ export function installByInstallerTask(installer: string, minecraft: MinecraftLo
 
         context.update(20, 100);
         // write version json
-        await context.execute(task("json", async () => {
+        await context.yield(task("json", async () => {
             await ensureFile(versionJSONPath);
             await writeFile(versionJSONPath, JSON.stringify(versionJSON, null, 4));
         }), 20);
 
         // write launch wrapper
-        await context.execute(task("library", async () => {
+        await context.yield(task("library", async () => {
             let wrapperDest = mc.getLibraryByPath(`launchwrapper-of/${launchWrapperVersion}/launchwrapper-of-${launchWrapperVersion}.jar`)
             await ensureFile(wrapperDest);
             await writeFile(wrapperDest, await zip.readEntry(launchWrapperEntry));
         }), 20);
 
         // write the optifine
-        await context.execute(task("jar", async () => {
+        await context.yield(task("jar", async () => {
             let dest = mc.getLibraryByPath(`optifine/Optifine/${mcversion}_${editionRelease}/Optifine-${mcversion}_${editionRelease}.jar`);
             let mcJar = mc.getVersionJar(mcversion);
 

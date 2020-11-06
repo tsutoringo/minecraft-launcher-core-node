@@ -55,7 +55,7 @@ export function installJreFromMojangTask(options: Options) {
     } = options;
     return task("installJreFromMojang", (context) => resolveDownloader(options, async function installJreFromMojang(options) {
         const info: { [system: string]: { [arch: string]: { jre: { sha1: string; url: string; version: string } } } }
-            = await context.execute(task("fetchInfo", () => fetchJson("https://launchermeta.mojang.com/mc/launcher.json")));
+            = await context.yield(task("fetchInfo", () => fetchJson("https://launchermeta.mojang.com/mc/launcher.json")));
         const system = platform.name;
         function resolveArch() {
             switch (platform.arch) {
@@ -74,7 +74,7 @@ export function installJreFromMojangTask(options: Options) {
         const filename = basename(url);
         const downloadDestination = resolve(cacheDir, filename);
 
-        await context.execute(task("download", downloadFileTask({
+        await context.yield(task("download", downloadFileTask({
             url,
             destination: downloadDestination,
             checksum: {
@@ -84,10 +84,10 @@ export function installJreFromMojangTask(options: Options) {
         }, options)));
 
         const javaRoot = destination;
-        await context.execute(task("decompress", async () => {
+        await context.yield(task("decompress", async () => {
             await unpackLZMA(downloadDestination, javaRoot);
         }));
-        await context.execute(task("cleanup", async () => { await unlink(downloadDestination); }));
+        await context.yield(task("cleanup", async () => { await unlink(downloadDestination); }));
     }));
 }
 

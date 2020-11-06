@@ -138,7 +138,7 @@ function installByInstallerTask(version: RequiredVersion, minecraft: MinecraftLo
             } : undefined,
         }, options));
 
-        await context.execute(downloadTask, 20);
+        await context.yield(downloadTask, 20);
 
         let zip = await open(installJarPath, { lazyEntries: true });
         let [forgeEntry, forgeUniversalEntry, clientDataEntry, serverDataEntry, installProfileEntry, versionEntry, legacyUniversalEntry] = await zip.filterEntries([

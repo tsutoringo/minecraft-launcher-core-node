@@ -255,9 +255,9 @@ export function install(type: "server" | "client", versionMeta: RequiredVersion,
 export function installTask(type: "server" | "client", versionMeta: RequiredVersion, minecraft: MinecraftLocation, option: Option = {}): Task<ResolvedVersion> {
     return task("install", (context) => resolveDownloader(option, async function install(option) {
         context.update(0, 100);
-        let version = await context.execute(installVersionTask(type, versionMeta, minecraft, option), 20);
+        let version = await context.yield(installVersionTask(type, versionMeta, minecraft, option), 20);
         if (type === "client") {
-            await context.execute(installDependenciesTask(version, option), 80);
+            await context.yield(installDependenciesTask(version, option), 80);
         }
         return version;
     }), { version: versionMeta.id });
@@ -289,9 +289,9 @@ export function installVersion(type: "client" | "server", versionMeta: Version, 
 export function installVersionTask(type: "client" | "server", versionMeta: RequiredVersion, minecraft: MinecraftLocation, options: JarOption = {}): Task<ResolvedVersion> {
     return task("installVersion", (context) => resolveDownloader(options, async function installVersion(options) {
         context.update(0, 100);
-        await context.execute(installVersionJsonTask(versionMeta, minecraft, options), 40);
+        await context.yield(installVersionJsonTask(versionMeta, minecraft, options), 40);
         let version = await VersionJson.parse(minecraft, versionMeta.id);
-        await context.execute(installVersionJarTask(type, version, minecraft, options), 60);
+        await context.yield(installVersionJarTask(type, version, minecraft, options), 60);
         return version;
     }), { version: versionMeta.id });
 }
@@ -323,8 +323,8 @@ export function installDependenciesTask(version: ResolvedVersion, options: Optio
     return task("installDependencies", (context) => resolveDownloader(options, async (options) => {
         context.update(0, 100);
         await Promise.all([
-            context.execute(installAssetsTask(version, options), 50),
-            context.execute(installLibrariesTask(version, options), 50),
+            context.yield(installAssetsTask(version, options), 50),
+            context.yield(installLibrariesTask(version, options), 50),
         ]);
         return version;
     }), { version: version.id });
@@ -355,7 +355,7 @@ export function installAssetsTask(version: ResolvedVersion, options: AssetsOptio
         let folder = MinecraftFolder.from(version.minecraftDirectory);
         let jsonPath = folder.getPath("assets", "indexes", version.assets + ".json");
 
-        await context.execute(task("assetsJson", downloadFileTask({
+        await context.yield(task("assetsJson", downloadFileTask({
             url: resolveDownloads(version.assetIndex.url, version, options.assetsIndexUrl),
             destination: jsonPath,
             checksum: {
@@ -642,8 +642,8 @@ export function installByProfileTask(installProfile: InstallProfile, minecraft: 
         let versionJson: VersionJson = await readFile(minecraftFolder.getVersionJson(installProfile.version)).then((b) => b.toString()).then(JSON.parse);
         let libraries = VersionJson.resolveLibraries([...installProfile.libraries, ...versionJson.libraries]);
 
-        await context.execute(installResolvedLibrariesTask(libraries, minecraft, options), 50);
-        await context.execute(postProcessTask(processor, minecraftFolder, java), 50);
+        await context.yield(installResolvedLibrariesTask(libraries, minecraft, options), 50);
+        await context.yield(postProcessTask(processor, minecraftFolder, java), 50);
     }));
 }
 

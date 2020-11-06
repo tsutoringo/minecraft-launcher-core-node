@@ -138,9 +138,9 @@ export function installCurseforgeModpackTask(zip: InputType, minecraft: Minecraf
         let mc = MinecraftFolder.from(minecraft);
         let zipFile = typeof zip === "string" || zip instanceof Buffer ? await open(zip) : zip;
 
-        let mainfest = options?.manifest ?? await context.execute(readManifestTask(zipFile), 10);
+        let mainfest = options?.manifest ?? await context.yield(readManifestTask(zipFile), 10);
 
-        await context.execute(Task.create("download", async (c) => {
+        await context.yield(Task.create("download", async (c) => {
             let requestor = options?.queryFileUrl || createDefaultCurseforgeQuery();
             let resolver = options?.filePathResolver || ((p, f, m, u) => m.getMod(basename(u)));
             let sizes = mainfest.files.map(() => 10);
@@ -155,7 +155,7 @@ export function installCurseforgeModpackTask(zip: InputType, minecraft: Minecraf
             await batchedTask(c, tasks, sizes, options.maxConcurrency, options.throwErrorImmediately, (e) => `Fail to install curseforge modpack to ${mc.root}: ${e.map((x: any) => x.message).join("\n")}`);
         }), 80);
 
-        await context.execute(Task.create("deploy", async (c) => {
+        await context.yield(Task.create("deploy", async (c) => {
             let total = Object.keys(zipFile.entries).filter((e) => e.startsWith(mainfest.overrides)).length;
             let processed = 0;
             c.update(processed, total);
