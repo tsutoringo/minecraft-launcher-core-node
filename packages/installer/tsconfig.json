@@ -7,7 +7,9 @@
         "curseforge.ts",
         "optifine.ts",
         "fabric.ts",
-        "util.ts"
+        "util.ts",
+        "utils.ts",
+        "downloader.ts"
     ],
     "compilerOptions": {
         "target": "es2018",

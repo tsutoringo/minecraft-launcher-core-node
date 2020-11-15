@@ -1,6 +1,7 @@
 import { Task } from "@xmcl/task";
 import { ExecOptions, spawn } from "child_process";
 import { createHash } from "crypto";
+import { EventEmitter } from "events";
 import { access as faccess, close as fclose, constants, copyFile as fcopyFile, createReadStream, createWriteStream, ftruncate, mkdir as fmkdir, open as fopen, readFile as freadFile, stat as fstat, unlink as funlink, writeFile as fwriteFile, WriteStream } from "fs";
 import { Agent as HttpAgent, AgentOptions, ClientRequest, IncomingMessage, request, RequestOptions } from "http";
 import { Agent as HttpsAgent, request as requests } from "https";
@@ -9,6 +10,7 @@ import { dirname } from "path";
 import { pipeline as pip } from "stream";
 import { fileURLToPath, format, parse, UrlWithStringQuery } from "url";
 import { promisify } from "util";
+import { MinecraftDownloadEventEmitter } from "./minecraft";
 
 const access = promisify(faccess);
 const open = promisify(fopen);
@@ -163,11 +165,8 @@ export interface Downloader {
 /**
  * The options pass into the {@link Downloader}.
  */
-export interface DownloaderOptions {
-    /**
-     * An customized downloader to swap default downloader.
-     */
-    downloader?: Downloader;
+export interface DownloadOptions {
+    eventHandler?: MinecraftDownloadEventEmitter<any>;
     /**
      * Decide should downloader redownload and overwrite existed file.
      *
@@ -543,7 +542,7 @@ export class HttpDownloader implements Downloader {
  * - If the checksum is not provided, it will return true if file existed.
  * - If the checksum is provided, it will return true if the file checksum matched.
  */
-async function shouldDownload(option: DownloadOption, downloaderOptions: DownloaderOptions): Promise<boolean> {
+async function shouldDownload(option: DownloadOption, downloaderOptions: DownloadOptions): Promise<boolean> {
     if (downloaderOptions.overwriteWhen === "always") {
         return true;
     }
@@ -561,7 +560,7 @@ async function shouldDownload(option: DownloadOption, downloaderOptions: Downloa
 /**
  * Wrapped task function of download file if absent task
  */
-export function downloadFileTask(option: DownloadOption, downloaderOptions: HasDownloader<DownloaderOptions>): Task.Function<void> {
+export function downloadFileTask(option: DownloadOption, downloaderOptions: HasDownloader<DownloadOptions>): Task.Function<void> {
     return async (context: Task.Context) => {
         option.handlers = context.setup;
         option.progress = (c, p, t, u) => context.update(p, t, u);
@@ -591,10 +590,10 @@ export interface InstallOptions {
     versionId?: string;
 }
 
-function hasDownloader(options: DownloaderOptions): options is HasDownloader<DownloaderOptions> {
+function hasDownloader(options: DownloadOptions): options is HasDownloader<DownloadOptions> {
     return !!options.downloader;
 }
-export function resolveDownloader<O extends DownloaderOptions, T>(options: O, closure: (options: HasDownloader<O>) => Promise<T>) {
+export function resolveDownloader<O extends DownloadOptions, T>(options: O, closure: (options: HasDownloader<O>) => Promise<T>) {
     if (hasDownloader(options)) {
         return closure(options);
     }

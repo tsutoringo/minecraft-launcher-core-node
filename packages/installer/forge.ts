@@ -1,11 +1,12 @@
 import { LibraryInfo, MinecraftFolder, MinecraftLocation, Version as VersionJson } from "@xmcl/core";
 import { parse as parseForge } from "@xmcl/forge-site-parser";
-import { Task } from "@xmcl/task";
 import { Entry, open } from "@xmcl/unzip";
 import { createWriteStream } from "fs";
 import { join } from "path";
+import { DownloadMultipleSourceFallbackTask } from "./downloader";
 import { installByProfileTask, InstallProfile, InstallProfileOption, LibraryOption, resolveLibraryDownloadUrls } from "./minecraft";
-import { downloadFileTask, getAndParseIfUpdate, InstallOptions as InstallOptionsBase, UpdatedObject, HasDownloader, normalizeArray, createErr, DownloaderOptions, ensureFile, pipeline, writeFile, resolveDownloader } from "./util";
+import { task } from "./task";
+import { downloadFileTask, getAndParseIfUpdate, InstallOptions as InstallOptionsBase, UpdatedObject, HasDownloader, normalizeArray, createErr, DownloadOptions, ensureFile, pipeline, writeFile, resolveDownloader } from "./util";
 
 export interface BadForgeInstallerJarError {
     error: "BadForgeInstallerJar";
@@ -91,7 +92,7 @@ export const DEFAULT_FORGE_MAVEN = "http://files.minecraftforge.net/maven";
 /**
  * The options to install forge.
  */
-export interface Options extends DownloaderOptions, LibraryOption, InstallOptionsBase, InstallProfileOption {
+export interface Options extends DownloadOptions, LibraryOption, InstallOptionsBase, InstallProfileOption {
 }
 
 function installByInstallerTask(version: RequiredVersion, minecraft: MinecraftLocation, options: Options) {
@@ -104,7 +105,7 @@ function installByInstallerTask(version: RequiredVersion, minecraft: MinecraftLo
         return `${version.mcversion}-${version.version}`;
     }
 
-    return Task.create("installForge", (context) => resolveDownloader(options, async function (options) {
+    return task("installForge", async function () {
         const mc = MinecraftFolder.from(minecraft);
         const forgeVersion = getForgeArtifactVersion();
 
@@ -126,7 +127,7 @@ function installByInstallerTask(version: RequiredVersion, minecraft: MinecraftLo
         let mavenHost = options.mavenHost ? [...normalizeArray(options.mavenHost), DEFAULT_FORGE_MAVEN] : [DEFAULT_FORGE_MAVEN];
         let urls = resolveLibraryDownloadUrls(library, { ...options, mavenHost });
 
-        context.update(0, 120);
+        // context.update(0, 120);
 
         let installJarPath = mc.getLibraryByPath(library.path);
         let downloadTask = Task.create("downloadInstaller", downloadFileTask({
@@ -238,7 +239,7 @@ function installByInstallerTask(version: RequiredVersion, minecraft: MinecraftLo
 
             return versionJson.id;
         }
-    }));
+    });
 }
 
 /**
