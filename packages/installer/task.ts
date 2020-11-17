@@ -36,11 +36,17 @@ export interface TaskContext {
     (event: Event): void;
 }
 
+export enum State {
+    Idel,
+    Running,
+    Cancelled,
+    Paused,
+    Successed,
+    Failed
+}
+
 export abstract class BaseTask<T> {
-    protected _isPaused = false;
-    protected _isCancelled = false;
-    protected _isDone = false;
-    protected _isStarted = false;
+    protected _state: State = State.Idel
     protected _promise: Promise<T> = new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
@@ -60,52 +66,50 @@ export abstract class BaseTask<T> {
 
     readonly abstract name: string;
 
-    get isCancelled() { return this._isCancelled; }
-    get isPaused() { return this._isPaused; }
-    get isDone() { return this._isDone; }
-    get isStarted() { return this._isStarted; }
+    get isCancelled() { return this._state === State.Cancelled; }
+    get isPaused() { return this._state === State.Paused; }
+    get isDone() { return this._state === State.Successed; }
+    get isRunning() { return this._state === State.Running; }
+
+    get state() { return this._state }
 
     pause() {
-        if (this._isDone || this._isCancelled || !this._isStarted) { return; }
-        if (!this._isPaused) {
-            this._isPaused = true;
-            this.onPause();
-            this.fire("pause")
-        }
+        if (this._state !== State.Running) { return; }
+        this._state = State.Paused;
+        this.onPause();
+        this.fire("pause")
     }
     resume() {
-        if (this._isDone || this._isCancelled || !this._isStarted) { return; }
-        if (this._isPaused) {
-            this._isPaused = false;
-            this.onResume();
-            this.fire("resume")
-        }
+        if (this._state !== State.Paused) { return; }
+        this._state = State.Running;
+        this.onResume();
+        this.fire("resume")
     }
     cancel() {
-        if (this._isDone) { return; }
-        if (!this._isCancelled) {
-            this._isCancelled = true;
-            this.onCancel();
-            this.fire("cancel")
-        }
+        if (this.state !== State.Running && this.state !== State.Idel) { return; }
+        this._state = State.Cancelled;
+        this.onCancel();
+        this.fire("cancel")
     }
     wait() {
         return this._promise;
     }
     start(context?: TaskContext) {
-        if (this._isStarted) {
-            return;
-        }
-        if (this._isCancelled) {
+        if (this._state === State.Cancelled) {
             throw new CancelledError(undefined);
         }
+        if (this._state !== State.Idel) {
+            return;
+        }
         this.context = context;
-        this._isStarted = true;
+        this._state = State.Running;
         this.run().then((value) => {
             this.resolve(value);
+            this._state = State.Successed
             this.fire("success");
         }, (error) => {
             this.reject(error);
+            this._state = State.Failed
             this.fire("fail");
         });
         this.fire("start")
@@ -162,14 +166,15 @@ export abstract class LoopedTask<T> extends BaseTask<T> {
 
     protected async run() {
         let result: T | undefined;
-        while (!this._isDone) {
+        let isDone = false;
+        while (!isDone) {
             try {
-                [this._isDone, result] = await this.process();
-                if (this._isCancelled) {
+                [isDone, result] = await this.process();
+                if (this.state === State.Cancelled) {
                     throw new CancelledError<T>(result);
                 }
                 await this._pausing;
-                if (!this._isDone) {
+                if (!isDone) {
                     continue;
                 }
                 await this.validate();
@@ -178,7 +183,7 @@ export abstract class LoopedTask<T> extends BaseTask<T> {
                     throw e;
                 }
                 // if not throw, reset the state and retry
-                this._isDone = false;
+                isDone = false;
                 this.reset();
             }
         }
