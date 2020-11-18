@@ -1,7 +1,7 @@
 import { MinecraftFolder, MinecraftLocation, ResolvedLibrary, ResolvedVersion, Version } from "@xmcl/core";
-import { Task, task } from "@xmcl/task";
+import { task } from "@xmcl/task";
 import { InstallProfile, resolveProcessors } from "./minecraft";
-import { checksum, readFile, exists } from "./util";
+import { checksum, exists, isNotNull, readFile } from "./util";
 
 async function getSha1(file: string) {
     return checksum(file, "sha1");
@@ -158,97 +158,110 @@ async function diagnoseSingleFile(role: Issue["role"], file: string, expectedChe
  * @param minecraft The minecraft location
  * @beta
  */
-export function diagnoseTask(version: string, minecraftLocation: MinecraftLocation): Task<MinecraftIssueReport> {
+export async function diagnose(version: string, minecraftLocation: MinecraftLocation): Promise<MinecraftIssueReport> {
     const minecraft = MinecraftFolder.from(minecraftLocation);
-    return task("diagnose", async function diagnose(context: Task.Context) {
-        let report: MinecraftIssueReport = {
-            minecraftLocation: minecraft,
-            version: version,
-            issues: [],
+    let report: MinecraftIssueReport = {
+        minecraftLocation: minecraft,
+        version: version,
+        issues: [],
+    }
+    let issues: Issue[] = report.issues;
+
+    let resolvedVersion: ResolvedVersion;
+    try {
+        resolvedVersion = await Version.parse(minecraft, version);
+    } catch (e) {
+        if (e.error === "CorruptedVersionJson") {
+            issues.push({ type: "corrupted", role: "versionJson", file: minecraft.getVersionJson(e.version), expectedChecksum: "", receivedChecksum: "", hint: "Re-install the minecraft!" });
+        } else {
+            issues.push({ type: "missing", role: "versionJson", file: minecraft.getVersionJson(e.version), expectedChecksum: "", receivedChecksum: "", hint: "Re-install the minecraft!" });
         }
-        let issues: Issue[] = report.issues;
-
-        let resolvedVersion: ResolvedVersion;
-        try {
-            resolvedVersion = await context.execute(task("checkVersionJson", () => Version.parse(minecraft, version)));
-        } catch (e) {
-            if (e.error === "CorruptedVersionJson") {
-                issues.push({ type: "corrupted", role: "versionJson", file: minecraft.getVersionJson(e.version), expectedChecksum: "", receivedChecksum: "", hint: "Re-install the minecraft!" });
-            } else {
-                issues.push({ type: "missing", role: "versionJson", file: minecraft.getVersionJson(e.version), expectedChecksum: "", receivedChecksum: "", hint: "Re-install the minecraft!" });
-            }
-            return report;
-        }
-
-        await context.execute(task("checkJar", async function checkJar() {
-            let jarPath = minecraft.getVersionJar(resolvedVersion.minecraftVersion);
-            let issue: MinecraftJarIssue | undefined = await diagnoseSingleFile("minecraftJar",
-                jarPath,
-                resolvedVersion.downloads.client.sha1,
-                "Problem on Minecraft jar! Please consider to use Installer.instalVersion to fix.");
-            if (issue) {
-                issue.version = resolvedVersion.minecraftVersion;
-                issues.push(issue);
-            }
-        }));
-
-        let assetsIndexPath = minecraft.getAssetsIndex(resolvedVersion.assets);
-        let validAssetIndex = await context.execute(task("checkAssetIndex", async function checkAssetIndex() {
-            let issue: AssetIndexIssue | undefined = await diagnoseSingleFile("assetIndex",
-                assetsIndexPath,
-                resolvedVersion.assetIndex.sha1,
-                "Problem on assets index file! Please consider to use Installer.installAssets to fix.");
-            if (issue) {
-                issue.version = resolvedVersion.minecraftVersion;
-                issues.push(issue);
-                return false;
-            }
-            return true;
-        }));
-        await context.execute(task("checkLibraries", function checkLibraries() {
-            return Promise.all(resolvedVersion.libraries.map(async (lib) => {
-                let libPath = minecraft.getLibraryByPath(lib.download.path);
-                let issue: LibraryIssue | undefined = await diagnoseSingleFile("library", libPath, lib.download.sha1,
-                    "Problem on library! Please consider to use Installer.installLibraries to fix.");
-                if (issue) {
-                    issue.library = lib;
-                    issues.push(issue);
-                }
-            }));
-        }));
-        if (validAssetIndex) {
-            let objects = (await readFile(assetsIndexPath, "utf-8").then((b) => JSON.parse(b.toString()))).objects;
-            let filenames = Object.keys(objects);
-            await context.execute(task("checkAssets", function checkAssets() {
-                return Promise.all(filenames.map(async (filename) => {
-                    let { hash, size } = objects[filename];
-                    let assetPath = minecraft.getAsset(hash);
-
-                    let issue: AssetIssue | undefined = await diagnoseSingleFile("asset", assetPath, hash,
-                        "Problem on asset! Please consider to use Installer.installAssets to fix.");
-                    if (issue) {
-                        issue.asset = { name: filename, hash, size };
-                        issues.push(issue);
-                    }
-                }));
-            }));
-        }
-
         return report;
-    });
+    }
+
+    const jarIssue = await diagnoseJar(resolvedVersion, minecraft);
+
+    if (jarIssue) {
+        report.issues.push(jarIssue);
+    }
+
+    const assetIndexIssue = await diagnoseAssetIndex(resolvedVersion, minecraft);
+
+    if (assetIndexIssue) {
+        report.issues.push(assetIndexIssue);
+    }
+
+    const librariesIssues = await diagnoseLibraries(resolvedVersion, minecraft);
+
+    if (librariesIssues.length > 0) {
+        report.issues.push(...librariesIssues);
+    }
+
+    if (!assetIndexIssue) {
+        const objects = (await readFile(minecraft.getAssetsIndex(resolvedVersion.assets), "utf-8").then((b) => JSON.parse(b.toString()))).objects;
+        const assetsIssues = await diagnoseAssets(objects, minecraft);
+
+        if (assetsIssues.length > 0) {
+            report.issues.push(...assetsIssues);
+        }
+    }
+
+    return report;
 }
 
-/**
- * Diagnose the version. It will check the version json/jar, libraries and assets.
- * @beta
- *
- * @param version The version id string
- * @param minecraft The minecraft location
- */
-export function diagnose(version: string, minecraft: MinecraftLocation): Promise<MinecraftIssueReport> {
-    return Task.execute(diagnoseTask(version, minecraft)).wait();
+export async function diagnoseAssets(assetObjects: Record<string, { hash: string; size: number }>, minecraft: MinecraftFolder) {
+    const filenames = Object.keys(assetObjects);
+    const issues = await Promise.all(filenames.map(async (filename) => {
+        let { hash, size } = assetObjects[filename];
+        let assetPath = minecraft.getAsset(hash);
+
+        let issue: AssetIssue | undefined = await diagnoseSingleFile("asset", assetPath, hash,
+            "Problem on asset! Please consider to use Installer.installAssets to fix.");
+        if (issue) {
+            issue.asset = { name: filename, hash, size };
+        }
+
+        return issue;
+    }));
+    return issues.filter(isNotNull);
 }
 
+export async function diagnoseLibraries(resolvedVersion: ResolvedVersion, minecraft: MinecraftFolder): Promise<Array<LibraryIssue>> {
+    const issues = await Promise.all(resolvedVersion.libraries.map(async (lib) => {
+        const libPath = minecraft.getLibraryByPath(lib.download.path);
+        const issue: LibraryIssue | undefined = await diagnoseSingleFile("library", libPath, lib.download.sha1,
+            "Problem on library! Please consider to use Installer.installLibraries to fix.");
+        if (issue) {
+            issue.library = lib;
+        }
+        return issue;
+    }));
+    return issues.filter(isNotNull);
+}
+
+export async function diagnoseAssetIndex(resolvedVersion: ResolvedVersion, minecraft: MinecraftFolder): Promise<AssetIndexIssue | undefined> {
+    const assetsIndexPath = minecraft.getAssetsIndex(resolvedVersion.assets);
+    const issue: AssetIndexIssue | undefined = await diagnoseSingleFile("assetIndex",
+        assetsIndexPath,
+        resolvedVersion.assetIndex.sha1,
+        "Problem on assets index file! Please consider to use Installer.installAssets to fix.");
+    if (issue) {
+        issue.version = resolvedVersion.minecraftVersion;
+    }
+    return issue;
+}
+
+export async function diagnoseJar(resolvedVersion: ResolvedVersion, minecraft: MinecraftFolder): Promise<MinecraftJarIssue | undefined> {
+    const jarPath = minecraft.getVersionJar(resolvedVersion.minecraftVersion);
+    const issue: MinecraftJarIssue | undefined = await diagnoseSingleFile("minecraftJar",
+        jarPath,
+        resolvedVersion.downloads.client.sha1,
+        "Problem on Minecraft jar! Please consider to use Installer.instalVersion to fix.");
+    if (issue) {
+        issue.version = resolvedVersion.minecraftVersion;
+    }
+    return issue;
+}
 
 /**
  * Diagnose a install profile status. Check if it processor output correctly processed.

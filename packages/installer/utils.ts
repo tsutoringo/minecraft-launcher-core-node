@@ -3,6 +3,7 @@ import { pipeline as pip } from "stream";
 import { promisify } from "util";
 import { createHash } from "crypto";
 import { dirname } from "path";
+import { CancelledError } from "@xmcl/task";
 
 export const access = promisify(faccess);
 export const open = promisify(fopen);
@@ -67,4 +68,29 @@ export async function checksum(path: string, algorithm: string = "sha1"): Promis
     let hash = createHash(algorithm).setEncoding("hex");
     await pipeline(createReadStream(path), hash);
     return hash.read();
+}
+
+/**
+ * The collection of errors happened during a parallel process
+ */
+export class MultipleError extends Error {
+    constructor(public errors: unknown[], message?: string) { super(message); };
+}
+
+export async function all(promises: Promise<any>[], throwErrorImmediately?: boolean, getErrorMessage?: (errors: unknown[]) => string): Promise<any[]> {
+    const errors: unknown[] = [];
+    const result = await Promise.all(promises.map(async (promise) => {
+        try {
+            return promise;
+        } catch (error) {
+            if (throwErrorImmediately || error instanceof CancelledError) {
+                throw error;
+            }
+            errors.push(error);
+        }
+    }));
+    if (errors.length > 0) {
+        throw new MultipleError(errors, getErrorMessage?.(errors));
+    }
+    return result;
 }

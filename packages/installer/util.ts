@@ -122,46 +122,6 @@ export async function getLastModified(url: string, timestamp: string | undefined
     throw new Error(`Failure on response status code: ${statusCode}.`);
 }
 
-export interface DownloadOption {
-    url: string | string[];
-    headers?: { [key: string]: string };
-
-    /**
-     * The minimum bytes a segment should have.
-     * @default 2MB
-     */
-    segmentThreshold?: number;
-    /**
-     * If user wants to know the progress, pass this in, and `Downloader` should call this when there is a progress.
-     * @param chunkLength The length of just transferred chunk
-     * @param written The chunk already written to the disk
-     * @param total The total bytes of the download file
-     * @param url The remote url of the file
-     */
-    progress?: (chunkLength: number, written: number, total: number, url: string) => boolean | void;
-    /**
-     * If user wants to pause/resume/cancel the download, pass this in, and `Downloader` should call this to tell user how to pause and resume.
-     */
-    handlers?: (pauseFunc: () => void, resumeFunc: () => void, cancelFunc: () => void) => void;
-    /**
-     * The destination of the download on the disk
-     */
-    destination: string;
-    /**
-     * The checksum info of the file
-     */
-    checksum?: { algorithm: string; hash: string; };
-}
-
-export interface Downloader {
-    /**
-     * Download file to the disk
-     *
-     * @returns The downloaded file full path
-     */
-    downloadFile(option: DownloadOption): Promise<void>;
-}
-
 /**
  * The options pass into the {@link Downloader}.
  */
@@ -192,32 +152,6 @@ export interface DownloadOptions {
      * @default 2MB
      */
     segmentThreshold?: number;
-}
-
-function computeSegmenets(total: number, chunkSize: number, concurrency: number) {
-    let partSize = Math.max(chunkSize, Math.floor(total / concurrency));
-    let segments: Segment[] = [];
-    for (let cur = 0, chunkSize = 0; cur < total; cur += chunkSize) {
-        let remain = total - cur;
-        if (remain >= partSize) {
-            chunkSize = partSize;
-            segments.push({ start: cur, end: cur + chunkSize - 1 });
-        } else {
-            let last = segments[segments.length - 1];
-            if (!last) {
-                segments.push({ start: 0, end: remain - 1 });
-            } else {
-                last.end = last.end! + remain;
-            }
-            cur = total;
-        }
-    }
-    return segments;
-}
-
-export interface Segment {
-    start: number;
-    end?: number;
 }
 
 function isValidProtocol(protocol: string | undefined | null): protocol is "http:" | "https:" {
@@ -259,315 +193,10 @@ function fetch(options: RequestOptions, agents: { http?: HttpAgent, https?: Http
     });
 }
 
-interface DownloadMetadata {
-    url: string;
-    acceptRanges: boolean;
-    contentLength: number;
-    lastModified?: string;
-    eTag?: string;
-}
-
 export class ChecksumNotMatchError extends Error {
     constructor(readonly algorithm: string, readonly expect: string, readonly actual: string, readonly file: string) {
         super(`File ${file} ${algorithm} checksum not match. Expect: ${expect}. Actual: ${actual}`);
     }
-}
-
-
-/**
- * The default downloader based on nodejs http/https which support range (segment) download
- * and optimized for many small files downloading.
- * @beta
- */
-export class HttpDownloader implements Downloader {
-    constructor(readonly agents: Agents = {
-        http: new HttpAgent({
-            maxSockets: cpus().length * 4,
-            maxFreeSockets: 64,
-            keepAlive: true,
-        }),
-        https: new HttpsAgent({
-            maxSockets: cpus().length * 4,
-            maxFreeSockets: 64,
-            keepAlive: true,
-        }),
-    }, readonly headers: Record<string, string | string[] | null> = {}) { }
-
-    protected async resolveMetadata(parsedURL: UrlWithStringQuery): Promise<DownloadMetadata> {
-        let { message: msg } = await fetch({ ...parsedURL, method: "HEAD", ...this.headers }, this.agents);
-
-        msg.resume();
-        let { headers, url: resultUrl, statusCode } = msg;
-        statusCode = statusCode ?? 0;
-        if (statusCode >= 300 && statusCode < 400) {
-            throw new Error(`URL Moved: Status code ${statusCode} on ${resultUrl}`);
-        }
-        if (statusCode >= 400 && statusCode < 500) {
-            throw new Error(`HTTP Request Error: Status code ${statusCode} on ${resultUrl}`);
-        }
-        if (statusCode >= 500 && statusCode < 600) {
-            throw new Error(`HTTP Server Error: Status code ${statusCode} on ${resultUrl}`);
-        }
-        if (statusCode >= 200 && statusCode < 300) {
-            return {
-                url: resultUrl ?? format(parsedURL),
-                acceptRanges: headers["accept-ranges"] === "bytes",
-                contentLength: headers["content-length"] ? Number.parseInt(headers["content-length"]) : -1,
-                lastModified: headers["last-modified"],
-                eTag: headers.etag as string | undefined,
-            };
-        }
-        throw new Error(`Unexpected Error: Status code ${statusCode} on ${resultUrl}`);
-    }
-
-    protected async downloads(fd: number, originalUrl: UrlWithStringQuery, option: DownloadOption) {
-        let dest = option.destination;
-        let transferredTotal = 0;
-        let progress = option.progress ?? (() => { });
-        let headers = option.headers || {};
-
-        // metadata
-        let url: string = "";
-        let total: number = 0;
-        let eTag: string | undefined;
-        let acceptRanges: boolean = false;
-        let resolvedUrl: UrlWithStringQuery;
-        let segments: Segment[] = [];
-
-        // states
-        let paused = false;
-        let done = false;
-        let cancelled = false;
-        let _unpause: () => void;
-        let pausing: Promise<void> = Promise.resolve();
-        let abortRequests: Function[] = [];
-        let states: Segment[] = segments.map((s) => ({ ...s }));
-        let outputs: WriteStream[] = [];
-
-        let validate = async () => {
-            if (option.checksum) {
-                let actual = await checksum(option.destination, option.checksum.algorithm)
-                let expect = option.checksum.hash;
-                if (actual !== expect) {
-                    throw new ChecksumNotMatchError(option.checksum.algorithm, expect, actual, option.destination);
-                }
-            }
-        }
-
-        let reset = () => {
-            states = total && acceptRanges
-                ? computeSegmenets(total, option.segmentThreshold ?? 2 * 1024 * 1024, 4)
-                : [{ start: 0, end: total }];
-            outputs = states.map((seg) => createWriteStream(dest, {
-                fd,
-                start: seg.start,
-                autoClose: false,
-            }));
-            transferredTotal = 0;
-        }
-
-        let update = async () => {
-            let newMetadata = await this.resolveMetadata(originalUrl);
-            let unmatched = newMetadata.eTag !== eTag;
-            if (unmatched || newMetadata.eTag === undefined) {
-                url = newMetadata.url;
-                eTag = newMetadata.eTag;
-                acceptRanges = newMetadata.acceptRanges;
-                total = newMetadata.contentLength;
-                await truncate(fd, total);
-                resolvedUrl = parse(url);
-                reset();
-            }
-        }
-
-        let download = async () => {
-            let results = await Promise.all(states.map(async (seg, index) => {
-                if (seg.end && seg.start >= seg.end) {
-                    return true;
-                }
-                let options: RequestOptions = {
-                    ...resolvedUrl,
-                    method: "GET",
-                    headers: {
-                        ...this.headers,
-                        ...headers,
-                        Range: `bytes=${seg.start}-${seg.end ?? ""}`,
-                    },
-                };
-                let { message: input, request } = await fetch(options, this.agents);
-                input.on("data", (chunk) => {
-                    transferredTotal += chunk.length;
-                    seg.start += chunk.length;
-                    if (progress(chunk.length, transferredTotal, total, url)) {
-                        input.destroy(new Task.CancelledError());
-                    }
-                });
-                let output = outputs[index];
-                abortRequests[index] = () => {
-                    input.unpipe();
-                    request.abort();
-                };
-                input.pipe(output);
-                let requestPromise = new Promise<boolean>((resolve, reject) => {
-                    request.on("error", reject);
-                    request.on("abort", () => resolve(false));
-                    input.on("end", () => resolve(true));
-                });
-                let outputFinishPromise = new Promise((resolve, reject) => {
-                    output.on("error", reject);
-                    output.on("finish", () => resolve());
-                });
-                let [done] = await Promise.all([requestPromise, outputFinishPromise]);
-                return done;
-            }));
-            done = results.every((r) => r);
-        }
-
-        let pause = () => {
-            if (!paused) {
-                paused = true;
-                // update the pause handle
-                pausing = new Promise((resolve) => {
-                    _unpause = resolve;
-                });
-
-                // notify each request to abort
-                abortRequests.forEach((f) => f());
-                abortRequests.fill(() => { });
-            }
-        }
-        let resume = () => {
-            if (paused) {
-                paused = false;
-                _unpause();
-                _unpause = () => { };
-                pausing = Promise.resolve();
-            }
-        }
-        let cancel = () => {
-            if (!cancelled) {
-                cancelled = true;
-                // notify each request to abort
-                abortRequests.forEach((f) => f());
-                abortRequests.fill(() => { });
-            }
-        };
-        let shouldTolerateError = (e: any) => {
-            if (e.code === "ECONNRESET") {
-                return true;
-            }
-            if (e.code === "ETIMEDOUT") {
-                return true;
-            }
-            if (e.code === "EPROTO") {
-                return true;
-            }
-            if (e.code === "ECANCELED") {
-                return true;
-            }
-            if (e instanceof ChecksumNotMatchError) {
-                return true;
-            }
-            return false;
-        }
-        option.handlers?.(pause, resume, cancel);
-
-        let retry = 2;
-        while (!done) {
-            try {
-                await update();
-                await download();
-                if (cancelled) {
-                    return states;
-                }
-                await pausing;
-                if (!done) {
-                    continue;
-                }
-                await validate();
-            } catch (e) {
-                done = false;
-                reset();
-                retry -= 1;
-                if (!shouldTolerateError(e) || retry <= 0) {
-                    throw e;
-                }
-            }
-        }
-
-        return states;
-    }
-
-    /**
-     * Download file by the option provided.
-     */
-    async downloadFile(option: DownloadOption): Promise<void> {
-        let errors: unknown[] = [];
-        await ensureFile(option.destination);
-        let fd = await open(option.destination, "w");;
-        try {
-            await normalizeArray(option.url).reduce(async (memo, u) => memo.catch(async (e) => {
-                if (e instanceof Task.CancelledError) { throw e; }
-                try {
-                    let parsedURL = parse(u);
-                    if (parsedURL.protocol === "file:") {
-                        await close(fd);
-                        await copyFile(fileURLToPath(u), option.destination);
-                    } else {
-                        await this.downloads(fd, parsedURL, option);
-                        await close(fd);
-                    }
-                } catch (err) {
-                    errors.push(err);
-                    throw err;
-                }
-            }), Promise.reject<void>());
-        } catch (e) {
-            errors.pop();
-            e.errors = errors;
-            await close(fd).catch(() => { });
-            await unlink(option.destination).catch(() => { });
-            throw e;
-        }
-    }
-
-    destroy() {
-        this.agents.http?.destroy();
-        this.agents.https?.destroy();
-    }
-}
-
-/**
- * - If the file is not on the disk, it will return true.
- * - If the checksum is not provided, it will return true if file existed.
- * - If the checksum is provided, it will return true if the file checksum matched.
- */
-async function shouldDownload(option: DownloadOption, downloaderOptions: DownloadOptions): Promise<boolean> {
-    if (downloaderOptions.overwriteWhen === "always") {
-        return true;
-    }
-    let missed = await missing(option.destination);
-    if (missed) {
-        return true;
-    }
-    if (!option.checksum || option.checksum.hash.length === 0) {
-        return downloaderOptions.overwriteWhen === "checksumNotMatchOrEmpty";
-    }
-    const hash = await checksum(option.destination, option.checksum.algorithm);
-    return hash !== option.checksum.hash;
-}
-
-/**
- * Wrapped task function of download file if absent task
- */
-export function downloadFileTask(option: DownloadOption, downloaderOptions: HasDownloader<DownloadOptions>): Task.Function<void> {
-    return async (context: Task.Context) => {
-        option.handlers = context.setup;
-        option.progress = (c, p, t, u) => context.update(p, t, u);
-        if (await shouldDownload(option, downloaderOptions)) {
-            await downloaderOptions.downloader.downloadFile(option);
-        }
-    };
 }
 
 /**
@@ -590,31 +219,6 @@ export interface InstallOptions {
     versionId?: string;
 }
 
-function hasDownloader(options: DownloadOptions): options is HasDownloader<DownloadOptions> {
-    return !!options.downloader;
-}
-export function resolveDownloader<O extends DownloadOptions, T>(options: O, closure: (options: HasDownloader<O>) => Promise<T>) {
-    if (hasDownloader(options)) {
-        return closure(options);
-    }
-    let maxSockets = options.maxConcurrency ?? cpus().length * 4;
-    let agentOptions: AgentOptions = {
-        maxSockets,
-        maxFreeSockets: 64,
-        keepAlive: true,
-    };
-    let downloader = new HttpDownloader({
-        http: new HttpAgent(agentOptions),
-        https: new HttpsAgent(agentOptions),
-    });
-    return closure({
-        ...options,
-        downloader,
-    }).finally(() => downloader.destroy());
-}
-
-export type HasDownloader<T> = T & { downloader: Downloader, dispose?: () => void }
-
 export function spawnProcess(javaPath: string, args: string[], options?: ExecOptions) {
     return new Promise<void>((resolve, reject) => {
         let process = spawn(javaPath, args, options);
@@ -633,24 +237,6 @@ export function spawnProcess(javaPath: string, args: string[], options?: ExecOpt
     });
 }
 
-export async function batchedTask(context: Task.Context, tasks: Task<unknown>[], sizes: number[], maxConcurrency?: number, throwErrorImmediately?: boolean, getErrorMessage?: (errors: unknown[]) => string) {
-    throwErrorImmediately = throwErrorImmediately ?? false;
-    getErrorMessage = getErrorMessage ?? (() => "");
-
-    let errors = [] as unknown[];
-    context.update(0, sizes.reduce((a, b) => a + b, 0));
-    await Promise.all(tasks.map((task, index) => context.execute(task, sizes[index]).catch((e) => {
-        if (throwErrorImmediately || e instanceof Task.CancelledError) {
-            throw e;
-        } else {
-            errors.push(e);
-        }
-    })));
-    if (errors.length > 0) {
-        throw new MultipleError(errors, getErrorMessage(errors));
-    }
-}
-
 export function normalizeArray<T>(arr: T | T[] = []): T[] {
     return arr instanceof Array ? arr : [arr];
 }
@@ -663,13 +249,6 @@ export function joinUrl(a: string, b: string) {
         return a + "/" + b;
     }
     return a + b;
-}
-
-/**
- * The collection of errors happened during a parallel process
- */
-export class MultipleError extends Error {
-    constructor(public errors: unknown[], message?: string) { super(message); };
 }
 
 export function createErr<T>(error: T, message?: string): T & Error {
@@ -712,4 +291,8 @@ export async function checksum(path: string, algorithm: string = "sha1"): Promis
     let hash = createHash(algorithm).setEncoding("hex");
     await pipeline(createReadStream(path), hash);
     return hash.read() as string;
+}
+
+export function isNotNull<T>(v: T | undefined): v is T {
+    return v !== undefined
 }

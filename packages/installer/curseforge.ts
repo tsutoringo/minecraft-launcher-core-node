@@ -1,10 +1,15 @@
 import { MinecraftFolder, MinecraftLocation } from "@xmcl/core";
-import { Task } from "@xmcl/task";
-import { CachedZipFile, open } from "@xmcl/unzip";
+import { BaseTask, CancelledError, LoopedTask, State, task, Task, TaskContext } from "@xmcl/task";
+import { CachedZipFile, open, openEntryReadStream } from "@xmcl/unzip";
+import { createWriteStream } from "fs";
 import { Agent as HttpsAgent } from "https";
 import { basename, join } from "path";
+import { Readable, Writable } from "stream";
+import { Entry } from "yauzl";
+import { DownloadTask, Segment } from "./downloader";
 import { DownloaderOption } from "./minecraft";
-import { batchedTask, downloadFileTask, createErr, resolveDownloader, fetchText } from "./util";
+import { createErr, fetchText, isNotNull, pipeline } from "./util";
+import { all } from "./utils";
 
 export interface Options extends DownloaderOption {
     /**
@@ -83,7 +88,7 @@ export interface File {
  * @throws {@link BadCurseforgeModpackError}
  */
 export function readManifestTask(zip: InputType) {
-    return Task.create("unpack", async () => {
+    return task("unpack", async () => {
         let zipFile = typeof zip === "string" || zip instanceof Buffer ? await open(zip) : zip;
         let mainfiestEntry = zipFile.entries["manifest.json"];
         if (!mainfiestEntry) {
@@ -100,7 +105,7 @@ export function readManifestTask(zip: InputType) {
  * @throws {@link BadCurseforgeModpackError}
  */
 export function readManifest(zip: InputType) {
-    return readManifestTask(zip).execute().wait();
+    return readManifestTask(zip).startAndWait();
 }
 
 export type FilePathResolver = (projectId: number, fileId: number, minecraft: MinecraftFolder, url: string) => string | Promise<string>;
@@ -119,7 +124,157 @@ export function createDefaultCurseforgeQuery(): CurseforgeURLQuery {
  * @param options The options for query curseforge
  */
 export function installCurseforgeModpack(zip: InputType, minecraft: MinecraftLocation, options?: Options) {
-    return installCurseforgeModpackTask(zip, minecraft, options).execute().wait();
+    return installCurseforgeModpackTask(zip, minecraft, options).startAndWait();
+}
+
+class DownloadCurseforgeFileTask extends DownloadTask {
+    name: string;
+    param: object;
+
+    constructor(url: string, to: string) {
+        super({
+            destination: to,
+            url: url
+        });
+
+        this.name = ""
+        this.param = {};
+    }
+}
+
+export class DownloadCurseforgeFilesTask extends BaseTask<void> {
+    name: string;
+    param: object;
+
+    constructor(readonly manifest: Manifest, readonly minecraft: MinecraftFolder, readonly options: Options) {
+        super();
+        this.name = "download";
+        this.param = manifest;
+    }
+
+    private tasks: Task<Segment[]>[] = [];
+
+    protected async run(): Promise<void> {
+        const requestor = this.options?.queryFileUrl || createDefaultCurseforgeQuery();
+        const resolver = this.options?.filePathResolver || ((p, f, m, u) => m.getMod(basename(u)));
+        const minecraft = this.minecraft;
+        const tasks = await Promise.all(this.manifest.files.map(async (f) => {
+            const from = await requestor(f.projectID, f.fileID);
+
+            let to = resolver(f.projectID, f.fileID, minecraft, from);
+            if (typeof to !== "string") {
+                to = await to;
+            }
+            return new DownloadCurseforgeFileTask(from, to);
+        }));
+        this.tasks = tasks;
+        const context: TaskContext = (e) => {
+            if (e.type === "update") {
+                const progress = tasks.map((t) => t.progress).reduce((a, b) => a + b);
+                const total = tasks.map((t) => t.total).reduce((a, b) => a + b);
+                this.update({
+                    chunkSize: e.chunkSize,
+                    from: e.from,
+                    to: e.to,
+                    progress,
+                    total,
+                })
+            }
+        };
+        await all(tasks.map((t) => t.startAndWait(context)), this.options.throwErrorImmediately,
+            (errs) => `Fail to install curseforge modpack to ${minecraft.root}: ${errs.map((x: any) => x.message).join("\n")}`);
+    }
+    protected onCancel(): void {
+        this.tasks.forEach((t) => t.cancel());
+    }
+    protected onPause(): void {
+        this.tasks.forEach((t) => t.pause());
+    }
+    protected onResume(): void {
+        this.tasks.forEach((t) => t.resume());
+    }
+}
+
+export class DeployTask extends LoopedTask<void> {
+    name: string;
+    param: object;
+
+    private streams: [Readable, Writable][] = []
+
+    constructor(private zipFile: CachedZipFile, private manifest: Manifest, minecraft: MinecraftFolder) {
+        super();
+        this._to = minecraft.root;
+        this.name = "deploy";
+        this.param = manifest;
+    }
+
+
+    protected async handleEntry(entry: Entry, relativePath: string) {
+        const file = join(this.to!, relativePath);
+        if (this._state === State.Cancelled) {
+            throw new CancelledError(undefined);
+        }
+        if (this.isPaused) {
+            await this._pausing;
+        }
+        const readStream = await openEntryReadStream((this.zipFile as any).delegate, entry);
+        if (this.isCancelled) {
+            throw new CancelledError(undefined);
+        }
+        if (this.isPaused) {
+            await this._pausing;
+        }
+        const writeStream = createWriteStream(file);
+        readStream.on('data', (buf: Buffer) => {
+            this.update({
+                chunkSize: buf.length,
+                progress: this._progress + buf.length,
+                total: this._total
+            })
+        });
+        await pipeline(readStream, writeStream);
+    }
+
+    protected async process(): Promise<[boolean, void | undefined]> {
+        const zipFile = this.zipFile;
+
+        const entries = Object.values(zipFile.entries)
+            .filter(isNotNull)
+            .filter((e) => !e.fileName.endsWith("/"))
+            .filter((e) => e.fileName.startsWith(this.manifest.overrides));
+
+        const total = entries.map((e) => e.uncompressedSize).reduce((a, b) => a + b);
+
+        this.update({
+            total,
+            progress: 0,
+            chunkSize: 0,
+        });
+
+        await Promise.all(entries.map((e) => this.handleEntry(e, e.fileName)));
+
+        return [true, undefined];
+    }
+    protected validate(): Promise<void> {
+        return Promise.resolve();
+    }
+    protected shouldTolerant(e: any): boolean {
+        return false;
+    }
+    protected abort(isCancelled: boolean): void {
+        if (isCancelled) {
+            for (const [read, write] of this.streams) {
+                read.unpipe();
+                read.destroy(new CancelledError(undefined));
+                this.zipFile.close();
+            }
+        } else {
+            for (const [read] of this.streams) {
+                read.pause();
+            }
+        }
+    }
+    protected reset(): void { }
 }
 
 /**
@@ -134,63 +289,35 @@ export function installCurseforgeModpack(zip: InputType, minecraft: MinecraftLoc
  * @throws {@link BadCurseforgeModpackError}
  */
 export function installCurseforgeModpackTask(zip: InputType, minecraft: MinecraftLocation, options: Options = {}) {
-    return Task.create("installCurseforgeModpack", (context) => resolveDownloader(options, async function installCurseforgeModpack(options) {
-        let mc = MinecraftFolder.from(minecraft);
-        let zipFile = typeof zip === "string" || zip instanceof Buffer ? await open(zip) : zip;
+    return task("installCurseforgeModpack", async function () {
+        const folder = MinecraftFolder.from(minecraft);
+        const zipFile = typeof zip === "string" || zip instanceof Buffer ? await open(zip) : zip;
 
-        let mainfest = options?.manifest ?? await context.execute(readManifestTask(zipFile), 10);
-
-        await context.execute(Task.create("download", async (c) => {
-            let requestor = options?.queryFileUrl || createDefaultCurseforgeQuery();
-            let resolver = options?.filePathResolver || ((p, f, m, u) => m.getMod(basename(u)));
-            let sizes = mainfest.files.map(() => 10);
-            let tasks = mainfest.files.map((f) => Task.create("file", async (c) => {
-                let u = await requestor(f.projectID, f.fileID);
-                let dest = resolver(f.projectID, f.fileID, mc, u);
-                if (typeof dest !== "string") {
-                    dest = await dest;
-                }
-                return downloadFileTask({ destination: dest, url: u }, options)(c);
-            }));
-            await batchedTask(c, tasks, sizes, options.maxConcurrency, options.throwErrorImmediately, (e) => `Fail to install curseforge modpack to ${mc.root}: ${e.map((x: any) => x.message).join("\n")}`);
-        }), 80);
-
-        await context.execute(Task.create("deploy", async (c) => {
-            let total = Object.keys(zipFile.entries).filter((e) => e.startsWith(mainfest.overrides)).length;
-            let processed = 0;
-            c.update(processed, total);
-            await zipFile.extractEntries(mc.root, {
-                replaceExisted: options.replaceExisted,
-                entryHandler(root, e) {
-                    if (e.fileName.startsWith(mainfest.overrides)) {
-                        return e.fileName.substring(mainfest.overrides.length);
-                    }
-                    return undefined;
-                },
-                onAfterExtracted(_, e) {
-                    c.update(processed += 1, total, e.fileName);
-                }
-            });
-        }), 10);
+        const mainfest = options?.manifest ?? await this.yield(readManifestTask(zipFile));
+        await this.yield(new DownloadCurseforgeFilesTask(mainfest, folder, options));
+        await this.yield(new DeployTask(zipFile, mainfest, folder));
 
         return mainfest;
-    }));
+    });
 }
 
 /**
  * Install a cureseforge xml file to a specific locations
  */
 export function installCurseforgeFile(file: File, destination: string, options?: InstallFileOptions) {
-    return installCurseforgeFileTask(file, destination, options).execute().wait();
+    return installCurseforgeFileTask(file, destination, options).startAndWait();
 }
 
 /**
  * Install a cureseforge xml file to a specific locations
  */
 export function installCurseforgeFileTask(file: File, destination: string, options: InstallFileOptions = {}) {
-    return Task.create("installCurseforgeFile", (context) => resolveDownloader(options, async (options) => {
+    return task("installCurseforgeFile", async function () {
         let requestor = options.queryFileUrl || createDefaultCurseforgeQuery();
         let url = await requestor(file.projectID, file.fileID);
-        return downloadFileTask({ destination: join(destination, basename(url)), url }, options)(context);
-    }));
+        const context: TaskContext = (event) => {
+            this.context?.(event);
+        }
+        await new DownloadCurseforgeFileTask(url, join(destination, basename(url))).startAndWait(context);
+    });
 }

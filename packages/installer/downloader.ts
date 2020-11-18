@@ -2,8 +2,9 @@ import { createWriteStream, WriteStream } from "fs";
 import { Agent as HttpAgent, ClientRequest, IncomingMessage, request, RequestOptions } from "http";
 import { Agent as HttpsAgent, request as requests } from "https";
 import { fileURLToPath, format, parse } from "url";
-import { BaseTask, CancelledError, Event, LoopedTask } from "./task";
+import { BaseTask, CancelledError, Event, LoopedTask } from "@xmcl/task";
 import { checksum, close, copyFile, ensureFile, isValidProtocol, normalizeArray, open, truncate, unlink } from "./utils";
+import { cpus } from "os";
 
 export interface Agents {
     http?: HttpAgent;
@@ -168,9 +169,9 @@ async function startSegmentDownload(url: string, agents: Agents, headers: Record
     return [done, request, input] as const;
 }
 
-export class DownloadTask extends LoopedTask<Segment[]> {
+export abstract class DownloadTask extends LoopedTask<Segment[]> {
     protected options: DownloadSingleUrlOptions;
-    protected downloadMetadata: DownloadMetadata;
+    protected downloadMetadata!: DownloadMetadata;
     protected segments: Segment[] = [];
     protected outputs: WriteStream[] = [];
     protected connections: Connections[] = [];
@@ -179,15 +180,12 @@ export class DownloadTask extends LoopedTask<Segment[]> {
      * current fd
      */
     protected fd: number = -1;
-    /**
-     * Current progress
-     */
-    protected progress: number = 0;
 
     constructor(options: DownloadSingleUrlOptions) {
         super();
         this.options = options;
-        this.data.to = options.url;
+        this._from = options.url;
+        this._to = options.destination;
     }
 
     protected async updateMetadata() {
@@ -216,18 +214,17 @@ export class DownloadTask extends LoopedTask<Segment[]> {
     }
     protected async download() {
         const url = this.downloadMetadata.url;
-        const agents = this.options.agents;
-        const headers = this.options.headers;
+        const agents = this.options.agents ?? createDefaultAgents();
+        const headers = this.options.headers ?? {};
         const total = this.downloadMetadata.contentLength;
 
         let results = await Promise.all(this.segments.map(async (seg, index) => {
             const [done, req, res] = await startSegmentDownload(url, agents, headers, seg, this.outputs[index]);
-            if (req) {
+            if (req && res) {
                 res.on("data", (chunk) => {
-                    this.progress += chunk.length;
                     this.update({
                         chunkSize: chunk.length as number,
-                        progress: this.progress,
+                        progress: this.progress + chunk.length,
                         total,
                         from: url,
                         to: this.options.destination,
@@ -284,11 +281,11 @@ export class DownloadTask extends LoopedTask<Segment[]> {
             start: seg.start,
             autoClose: false,
         }));
-        this.progress = 0;
+        this._progress = 0;
     }
 }
 
-export abstract class DownloadMultipleSourceFallbackTask extends BaseTask<Segment[]> {
+export abstract class DownloadFallbackTask extends BaseTask<Segment[]> {
     private activeDownload: DownloadTask | undefined;
 
     constructor(private options: DownloadMultiUrlOptions) {
@@ -311,6 +308,9 @@ export abstract class DownloadMultipleSourceFallbackTask extends BaseTask<Segmen
         const context = (event: Event) => {
             if (event.type === "update") {
                 if (this.context) {
+                    event.name = this.name;
+                    event.param = this.param;
+                    event.paths = [this.name];
                     this.context(event);
                 }
             }
@@ -327,11 +327,11 @@ export abstract class DownloadMultipleSourceFallbackTask extends BaseTask<Segmen
                 if (parsedURL.protocol === "file:") {
                     await copyFile(fileURLToPath(u), options.destination);
                 } else {
-                    this.activeDownload = new DownloadTask({
+                    this.activeDownload = new (DownloadTask as any)({
                         ...this.options,
                         url: u,
                     });
-                    segments = await this.activeDownload.startAndWait(context);
+                    segments = await this.activeDownload!.startAndWait(context);
                 }
             }), Promise.reject<void>());
             return segments;
@@ -343,17 +343,20 @@ export abstract class DownloadMultipleSourceFallbackTask extends BaseTask<Segmen
     }
 }
 
-// {
-//     http: new HttpAgent({
-//         maxSockets: cpus().length * 4,
-//         maxFreeSockets: 64,
-//         keepAlive: true,
-//     }),
-//     https: new HttpsAgent({
-//         maxSockets: cpus().length * 4,
-//         maxFreeSockets: 64,
-//         keepAlive: true,
-//     }
+function createDefaultAgents() {
+    return {
+        http: new HttpAgent({
+            maxSockets: cpus().length * 4,
+            maxFreeSockets: 64,
+            keepAlive: true,
+        }),
+        https: new HttpsAgent({
+            maxSockets: cpus().length * 4,
+            maxFreeSockets: 64,
+            keepAlive: true,
+        })
+    };
+}
 
 
 // export function resolveDownloader<O extends DownloaderOptions, T>(options: O, closure: (options: HasDownloader<O>) => Promise<T>) {

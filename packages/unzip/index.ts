@@ -83,16 +83,32 @@ function extractCached(zipfile: yZipFile, dest: string, entries: yEntry[], optio
         entries = entries.filter((e) => targets.has(e.fileName));
     }
 
+    let aborted = false;
+
     async function handleEntry(entry: yEntry, relativePath: string | undefined) {
         if (relativePath) {
             let file = path.join(dest, relativePath);
             let existed = await ensureFile(file);
-            if (options.replaceExisted || !existed) {
-                await openEntryReadStream(zipfile, entry)
-                    .then((stream) => stream.pipe(fs.createWriteStream(file)))
-                    .then(finishStream)
-                    .then(() => { options.onAfterExtracted?.(file, entry) });
+            if (aborted) {
+                return;
             }
+            if (options.replaceExisted || !existed) {
+                const readStream = await openEntryReadStream(zipfile, entry);
+                if (aborted) {
+                    return;
+                }
+
+                const writeStream = fs.createWriteStream(file);
+
+                await finishStream(readStream.pipe(writeStream));
+                options.onAfterExtracted?.(file, entry)
+            }
+        }
+    }
+
+    if (options.signal) {
+        options.signal.onAbort = () => {
+            aborted = true;
         }
     }
 
@@ -194,7 +210,7 @@ function parseEntries(zipfile: yZipFile, entries: string[]) {
     });
 }
 
-function openEntryReadStream(zip: yZipFile, entry: yEntry, options?: yZipFileOptions) {
+export function openEntryReadStream(zip: yZipFile, entry: yEntry, options?: yZipFileOptions) {
     return new Promise<Readable>((resolve, reject) => {
         function handleStream(err: Error | undefined, stream: Readable | undefined) {
             if (err || !stream) { reject(err); }
@@ -561,4 +577,8 @@ export interface ExtractOptions {
      * The hook called after a entry extracted.
      */
     onAfterExtracted?: (destination: string, entry: Entry) => void;
+
+    signal?: {
+        onAbort: () => void;
+    }
 }

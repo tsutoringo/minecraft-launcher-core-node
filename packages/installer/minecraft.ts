@@ -1,11 +1,11 @@
 import { LibraryInfo, MinecraftFolder, MinecraftLocation, ResolvedLibrary, ResolvedVersion, Version as VersionJson } from "@xmcl/core";
-import { open, LazyZipFile } from "@xmcl/unzip";
+import { CancelledError, LoopedTask, task, TaskRoutine } from "@xmcl/task";
+import { LazyZipFile, open } from "@xmcl/unzip";
 import { EventEmitter } from "events";
 import { delimiter, join } from "path";
-import { DownloadMultipleSourceFallbackTask, DownloadTask } from "./downloader";
-import { InstallOptifineOptions } from "./optifine";
-import { BaseTask, CancelledError, Event, LoopedTask, task, TaskRoutine } from "./task";
-import { ensureDir, readFile, batchedTask, DownloadOptions, downloadFileTask, getAndParseIfUpdate, HasDownloader, joinUrl, normalizeArray, spawnProcess, UpdatedObject, createErr, checksum, resolveDownloader, MultipleError } from "./util";
+import { DownloadFallbackTask } from "./downloader";
+import { checksum, createErr, DownloadOptions, ensureDir, getAndParseIfUpdate, joinUrl, normalizeArray, readFile, spawnProcess, UpdatedObject } from "./util";
+import { all } from "./utils";
 
 /**
  * The function to swap library host.
@@ -285,28 +285,6 @@ export interface JarEvent extends VersionBaseInfo, MinecraftInstallEvent {
     eventTarget: "jar";
 }
 
-export function createEmitter(emitter: EventEmitter = new EventEmitter()): MinecraftDownloadEventEmitter {
-
-} 
-
-async function all(promises: Promise<any>[], throwErrorImmediately?: boolean, getErrorMessage?: () => string): Promise<any[]> {
-    const errors: unknown[] = [];
-    const result = await Promise.all(promises.map(async (promise) => {
-        try {
-            return promise;
-        } catch (error) {
-            if (throwErrorImmediately || error instanceof CancelledError) {
-                throw error;
-            }
-            errors.push(error);
-        }
-    }));
-    if (errors.length > 0) {
-        throw new MultipleError(errors, getErrorMessage?.());
-    }
-    return result;
-}
-
 /**
  * Install the Minecraft game to a location by version metadata.
  *
@@ -469,7 +447,7 @@ export function installVersionTask(versionMeta: VersionBaseInfo, minecraft: Mine
         const version = await VersionJson.parse(minecraft, versionMeta.id);
         await this.yield(new InstallJarTask(version, minecraft, options));
         return version;
-    });
+    }, versionMeta);
 }
 
 /**
@@ -592,11 +570,13 @@ export function installByProfileTask(installProfile: InstallProfile, minecraft: 
  */
 export class PostProcessingTask extends LoopedTask<void> {
     readonly name: string = "postProcessing";
+    readonly param: object;
 
     private pointer: number = 0;
 
     constructor(private processors: InstallProfile["processors"], private minecraft: MinecraftFolder, private java: string) {
         super();
+        this.param = processors
     }
 
     protected async shouldProcess(proc: InstallProfile["processors"][number]) {
@@ -689,8 +669,9 @@ export class PostProcessingTask extends LoopedTask<void> {
     }
 }
 
-export class InstallJsonTask extends DownloadMultipleSourceFallbackTask {
+export class InstallJsonTask extends DownloadFallbackTask {
     readonly name: string;
+    readonly param: object;
 
     constructor(version: VersionBaseInfo, minecraft: MinecraftLocation, options: Option) {
         const folder = MinecraftFolder.from(minecraft);
@@ -705,11 +686,13 @@ export class InstallJsonTask extends DownloadMultipleSourceFallbackTask {
         });
 
         this.name = "json";
+        this.param = version;
     }
 }
 
-export class InstallJarTask extends DownloadMultipleSourceFallbackTask {
+export class InstallJarTask extends DownloadFallbackTask {
     readonly name: string;
+    readonly param: object;
 
     constructor(version: ResolvedVersion, minecraft: MinecraftLocation, options: Option) {
         const folder = MinecraftFolder.from(minecraft);
@@ -726,11 +709,13 @@ export class InstallJarTask extends DownloadMultipleSourceFallbackTask {
         });
 
         this.name = "jar";
+        this.param = version;
     }
 }
 
-export class InstallAssetIndexTask extends DownloadMultipleSourceFallbackTask {
+export class InstallAssetIndexTask extends DownloadFallbackTask {
     readonly name: string;
+    readonly param: object;
 
     constructor(version: ResolvedVersion, options: AssetsOption = {}) {
         const folder = MinecraftFolder.from(version.minecraftDirectory);
@@ -745,11 +730,13 @@ export class InstallAssetIndexTask extends DownloadMultipleSourceFallbackTask {
         });
 
         this.name = "assetIndex";
+        this.param = version;
     }
 }
 
-export class InstallLibraryTask extends DownloadMultipleSourceFallbackTask {
+export class InstallLibraryTask extends DownloadFallbackTask {
     readonly name: string;
+    readonly param: object;
 
     constructor(lib: ResolvedLibrary, folder: MinecraftFolder, options: LibraryOption) {
         const libraryPath = lib.download.path;
@@ -767,11 +754,13 @@ export class InstallLibraryTask extends DownloadMultipleSourceFallbackTask {
         });
 
         this.name = "library";
+        this.param = lib;
     }
 }
 
-export class InstallAssetTask extends DownloadMultipleSourceFallbackTask {
+export class InstallAssetTask extends DownloadFallbackTask {
     readonly name: string;
+    readonly param: object;
 
     constructor(asset: AssetInfo, folder: MinecraftFolder, option: AssetsOption) {
         const assetsHosts = [
@@ -798,6 +787,7 @@ export class InstallAssetTask extends DownloadMultipleSourceFallbackTask {
         })
 
         this.name = "asset";
+        this.param = asset;
     }
 }
 

@@ -1,10 +1,12 @@
-import { Platform, getPlatform } from "@xmcl/core";
+import { getPlatform, Platform } from "@xmcl/core";
 import { Task, task } from "@xmcl/task";
 import { exec } from "child_process";
-import { EOL, tmpdir, platform } from "os";
+import { EOL, platform, tmpdir } from "os";
 import { basename, join, resolve } from "path";
+import { DownloadTask } from "./downloader";
 import { DownloaderOption } from "./minecraft";
-import { downloadFileTask, unlink, missing, resolveDownloader, fetchJson } from "./util";
+import { fetchJson, missing, unlink } from "./util";
+import { ensureDir } from "./utils";
 
 export interface JavaInfo {
     /**
@@ -39,8 +41,37 @@ export interface Options extends DownloaderOption {
     /**
      * Unpack lzma function. It must present, else it will not be able to unpack mojang provided LZMA.
      */
-    unpackLZMA: (src: string, dest: string) => Promise<void>;
+    unpackLZMA: UnpackLZMAFunction;
 }
+
+export type UnpackLZMAFunction =
+    ((src: string, dest: string) => Promise<void>) |
+    ((src: string, dest: string) => Task<void>);
+
+export class DownloadJRETask extends DownloadTask {
+    name: string;
+    param: object;
+
+    constructor(jre: DownloadInfo, dir: string) {
+        const { sha1, url } = jre;
+        const filename = basename(url);
+        const downloadDestination = resolve(dir, filename);
+
+        super({
+            url,
+            destination: downloadDestination,
+            checksum: {
+                algorithm: "sha1",
+                hash: sha1,
+            },
+        })
+
+        this.name = "downloadJre";
+        this.param = jre;
+    }
+}
+
+interface DownloadInfo { sha1: string; url: string; version: string }
 
 /**
  * Install JRE from Mojang offical resource. It should install jdk 8.
@@ -53,9 +84,9 @@ export function installJreFromMojangTask(options: Options) {
         cacheDir = tmpdir(),
         platform = getPlatform(),
     } = options;
-    return task("installJreFromMojang", (context) => resolveDownloader(options, async function installJreFromMojang(options) {
-        const info: { [system: string]: { [arch: string]: { jre: { sha1: string; url: string; version: string } } } }
-            = await context.execute(task("fetchInfo", () => fetchJson("https://launchermeta.mojang.com/mc/launcher.json")));
+    return task("installJreFromMojang", async function () {
+        const info: { [system: string]: { [arch: string]: { jre: DownloadInfo } } }
+            = await this.yield(task("fetchInfo", () => fetchJson("https://launchermeta.mojang.com/mc/launcher.json")));
         const system = platform.name;
         function resolveArch() {
             switch (platform.arch) {
@@ -70,25 +101,16 @@ export function installJreFromMojangTask(options: Options) {
         if (!info[system] || !info[system][currentArch] || !info[system][currentArch].jre) {
             throw new Error("No Java package available for your platform")
         }
-        const { sha1, url } = info[system][currentArch].jre;
-        const filename = basename(url);
-        const downloadDestination = resolve(cacheDir, filename);
-
-        await context.execute(task("download", downloadFileTask({
-            url,
-            destination: downloadDestination,
-            checksum: {
-                algorithm: "sha1",
-                hash: sha1,
-            },
-        }, options)));
-
-        const javaRoot = destination;
-        await context.execute(task("decompress", async () => {
-            await unpackLZMA(downloadDestination, javaRoot);
-        }));
-        await context.execute(task("cleanup", async () => { await unlink(downloadDestination); }));
-    }));
+        const lzmaPath = await this.yield(new DownloadJRETask(info[system][currentArch].jre, cacheDir).map(function () { return this.to! }));
+        const result = unpackLZMA(lzmaPath, destination);
+        await ensureDir(destination);
+        if (result instanceof Promise) {
+            await this.yield(task("decompress", () => result))
+        } else {
+            await this.yield(result);
+        }
+        await this.yield(task("cleanup", () => unlink(lzmaPath)));
+    });
 }
 
 /**
@@ -96,7 +118,7 @@ export function installJreFromMojangTask(options: Options) {
  * @param options The install options
  */
 export function installJreFromMojang(options: Options) {
-    return Task.execute(installJreFromMojangTask(options)).wait();
+    return installJreFromMojangTask(options).startAndWait();
 }
 
 /**
