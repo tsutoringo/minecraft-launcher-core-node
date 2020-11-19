@@ -11,9 +11,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@xmcl/core": "file:../core",
-    "@xmcl/forge-site-parser": "file:../forge-site-parser",
-    "@xmcl/task": "file:../task",
+    "@xmcl/core": "^2.4.0",
+    "@xmcl/forge-site-parser": "^2.0.5",
+    "@xmcl/task": "^2.2.0",
     "java-asm": "^0.0.6"
   },
   "scripts": {

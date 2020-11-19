@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@iarna/toml": "2.2.3",
-    "@xmcl/system": "file:../system",
+    "@xmcl/system": "^2.2.0",
     "java-asm": "0.0.6"
   },
   "scripts": {

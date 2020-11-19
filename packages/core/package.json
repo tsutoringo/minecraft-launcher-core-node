@@ -15,7 +15,7 @@
     "build": "npm run compile"
   },
   "dependencies": {
-    "@xmcl/unzip": "file:../unzip"
+    "@xmcl/unzip": "^1.2.0"
   },
   "repository": {
     "type": "git",

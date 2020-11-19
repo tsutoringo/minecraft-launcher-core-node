@@ -11,7 +11,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@xmcl/nbt": "file:../nbt"
+    "@xmcl/nbt": "^2.0.3"
   },
   "scripts": {
     "compile": "tsc --build tsconfig.json",

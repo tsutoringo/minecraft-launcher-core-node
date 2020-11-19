@@ -11,7 +11,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@xmcl/system": "file:../system"
+    "@xmcl/system": "^2.2.0"
   },
   "scripts": {
     "compile": "tsc --build tsconfig.json",

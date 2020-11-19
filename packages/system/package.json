@@ -15,7 +15,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@xmcl/unzip": "file:../unzip",
+    "@xmcl/unzip": "^1.2.0",
     "jszip": "^3.2.2"
   },
   "scripts": {
