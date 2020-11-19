@@ -208,7 +208,6 @@ export class DeployTask extends LoopedTask<void> {
         this.param = manifest;
     }
 
-
     protected async handleEntry(entry: Entry, relativePath: string) {
         const file = join(this.to!, relativePath);
         if (this._state === State.Cancelled) {
@@ -225,7 +224,7 @@ export class DeployTask extends LoopedTask<void> {
             await this._pausing;
         }
         const writeStream = createWriteStream(file);
-        readStream.on('data', (buf: Buffer) => {
+        readStream.on("data", (buf: Buffer) => {
             this.update({
                 chunkSize: buf.length,
                 progress: this._progress + buf.length,
@@ -267,6 +266,7 @@ export class DeployTask extends LoopedTask<void> {
                 read.unpipe();
                 read.destroy(new CancelledError(undefined));
                 this.zipFile.close();
+                write.destroy(new CancelledError(undefined));
             }
         } else {
             for (const [read] of this.streams) {

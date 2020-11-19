@@ -59,8 +59,8 @@ export interface InstallOptifineOptions extends InstallOptions {
  * @beta Might be changed and don't break the major version
  * @throws {@link BadOptifineJarError}
  */
-export function installByInstaller(installer: string, minecraft: MinecraftLocation, options?: InstallOptifineOptions) {
-    return installByInstallerTask(installer, minecraft, options).execute().wait();
+export function installOptifine(installer: string, minecraft: MinecraftLocation, options?: InstallOptifineOptions) {
+    return installOptifineTask(installer, minecraft, options).execute().wait();
 }
 
 /**
@@ -72,8 +72,8 @@ export function installByInstaller(installer: string, minecraft: MinecraftLocati
  * @beta Might be changed and don't break the major version
  * @throws {@link BadOptifineJarError}
  */
-export function installByInstallerTask(installer: string, minecraft: MinecraftLocation, options: InstallOptifineOptions = {}) {
-    return Task.create("installOptifine", async (context) => {
+export function installOptifineTask(installer: string, minecraft: MinecraftLocation, options: InstallOptifineOptions = {}) {
+    return task("installOptifine", async function () {
         let mc = MinecraftFolder.from(minecraft);
 
         context.update(0, 100);
@@ -82,7 +82,7 @@ export function installByInstallerTask(installer: string, minecraft: MinecraftLo
         context.update(10, 100);
 
         let entry = zip.entries["net/optifine/Config.class"]
-                                ?? zip.entries["Config.class"];
+            ?? zip.entries["Config.class"];
         if (!entry) {
             throw createErr({ error: "BadOptifineJar", entry: "net/optifine/Config.class" });
         }

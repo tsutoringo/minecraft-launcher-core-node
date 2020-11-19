@@ -280,7 +280,7 @@ export function installForgeTask(version: RequiredVersion, minecraft: MinecraftL
  *
  * @param option The option can control querying minecraft version, and page caching.
  */
-export async function getVersionList(option: {
+export async function getForgeVersionList(option: {
     /**
      * The minecraft version you are requesting
      */
