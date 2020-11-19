@@ -268,7 +268,7 @@ export abstract class BaseTask<T> implements Task<T> {
         this._to = data.to ?? this._to;
         if (this.context) {
             this.context({
-                type: 'update',
+                type: "update",
                 progress: this._progress,
                 total: this._total,
                 from: this._from,
@@ -433,7 +433,7 @@ export class TaskRoutine<T> extends BaseTask<T> implements TaskRuntime {
      */
     yield<T>(task: Task<T>): Promise<T> {
         if (this.state !== State.Running) {
-            throw new Error('IllegalState')
+            throw new Error("IllegalState")
         }
         const context = (event: Event) => {
             if (this.context) {
