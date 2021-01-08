@@ -1,0 +1,668 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@xmcl/nbt | minecraft-launcher-core-node - v0.1.1</title>
+	<meta name="description" content="Documentation for minecraft-launcher-core-node - v0.1.1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">minecraft-launcher-core-node - v0.1.1</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="xmcl_nbt.html">@xmcl/nbt</a>
+				</li>
+			</ul>
+			<h1>Module @xmcl/nbt</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>The nbt module provides nbt <a href="xmcl_nbt.html#serialize">serialize</a> and <a href="xmcl_nbt.html#deserialize">deserialize</a> functions.</p>
+					</div>
+					<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+						<h2>Usage</h2>
+					</a>
+					<a href="#read-and-write-nbt" id="read-and-write-nbt" style="color: inherit; text-decoration: none;">
+						<h3>Read and Write NBT</h3>
+					</a>
+					<p>You can simply deserialize/serialize nbt.</p>
+					<pre><code class="language-ts">    <span class="hljs-keyword">import</span> { serialize, deserialize } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@xmcl/nbt&quot;</span>;
+    <span class="hljs-keyword">const</span> fileData: Buffer;
+    <span class="hljs-comment">// compressed = undefined will not perform compress algorithm</span>
+    <span class="hljs-comment">// compressed = true will use gzip algorithm</span>
+    <span class="hljs-keyword">const</span> compressed: <span class="hljs-literal">true</span> | <span class="hljs-string">&quot;gzip&quot;</span> | <span class="hljs-string">&quot;deflate&quot;</span> | <span class="hljs-literal">undefined</span>;
+    <span class="hljs-keyword">const</span> readed: <span class="hljs-built_in">any</span> = <span class="hljs-keyword">await</span> deserialize(fileData, { compressed });
+    <span class="hljs-comment">// The deserialize return object contain NBTPrototype property which define its nbt type</span>
+    <span class="hljs-comment">// After you do the modification on it, you can serialize it back to NBT</span>
+    <span class="hljs-keyword">const</span> buf: Buffer = <span class="hljs-keyword">await</span> serialize(readed, { compressed });</code></pre>
+					<p>You can use class with annotation (decorator) to serialize/deserialize the type consistently.</p>
+					<p>Suppose you are reading the <a href="https://minecraft.gamepedia.com/Servers.dat_format">servers.dat</a>. You can have:</p>
+					<pre><code class="language-ts"><span class="hljs-keyword">import</span> { serialize, deserialize, TagType } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@xmcl/nbt&quot;</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServerInfo</span> </span>{
+    <span class="hljs-meta">@TagType</span>(TagType.String)
+    <span class="hljs-attr">icon</span>: <span class="hljs-built_in">string</span> = <span class="hljs-string">&quot;&quot;</span>;
+    <span class="hljs-meta">@TagType</span>(TagType.String)
+    <span class="hljs-attr">ip</span>: <span class="hljs-built_in">string</span> = <span class="hljs-string">&quot;&quot;</span>;
+    <span class="hljs-meta">@TagType</span>(TagType.String)
+    <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span> = <span class="hljs-string">&quot;&quot;</span>;
+    <span class="hljs-meta">@TagType</span>(TagType.Byte)
+    <span class="hljs-attr">acceptTextures</span>: <span class="hljs-built_in">number</span> = <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Servers</span> </span>{
+    <span class="hljs-meta">@TagType</span>([ServerInfo])
+    <span class="hljs-attr">servers</span>: ServerInfo[] = []
+}
+
+<span class="hljs-comment">// read</span>
+<span class="hljs-comment">// explict tell the function to deserialize into the type Servers</span>
+<span class="hljs-keyword">const</span> servers = <span class="hljs-keyword">await</span> deserialize(data, { <span class="hljs-attr">type</span>: Servers });
+<span class="hljs-keyword">const</span> infos: ServerInfo[] = servers.servers;
+
+<span class="hljs-comment">// write</span>
+<span class="hljs-keyword">const</span> servers: Servers;
+<span class="hljs-keyword">const</span> binary = <span class="hljs-keyword">await</span> serialize(servers);</code></pre>
+				</div>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Modules</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-module tsd-parent-kind-module"><a href="xmcl_nbt.internal_zlib.html" class="tsd-kind-icon">internal/zlib</a></li>
+								<li class="tsd-kind-module tsd-parent-kind-module"><a href="xmcl_nbt.utils.html" class="tsd-kind-icon">utils</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Namespaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-namespace tsd-parent-kind-module tsd-has-type-parameter"><a href="xmcl_nbt.tagtype.html" class="tsd-kind-icon">Tag<wbr>Type</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Classes</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_nbt.readcontext.html" class="tsd-kind-icon">Read<wbr>Context</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_nbt.writecontext.html" class="tsd-kind-icon">Write<wbr>Context</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Interfaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter"><a href="../interfaces/xmcl_nbt.deserializationoption.html" class="tsd-kind-icon">Deserialization<wbr>Option</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/xmcl_nbt.io.html" class="tsd-kind-icon">IO</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/xmcl_nbt.nbtprototype.html" class="tsd-kind-icon">NBTPrototype</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/xmcl_nbt.serializationoption.html" class="tsd-kind-icon">Serialization<wbr>Option</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Type aliases</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="xmcl_nbt.html#compoundschema" class="tsd-kind-icon">Compound<wbr>Schema</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="xmcl_nbt.html#listschema" class="tsd-kind-icon">List<wbr>Schema</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="xmcl_nbt.html#schema" class="tsd-kind-icon">Schema</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="xmcl_nbt.html#tagtype-1" class="tsd-kind-icon">Tag<wbr>Type</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="xmcl_nbt.html#tagtypeprimitive" class="tsd-kind-icon">Tag<wbr>Type<wbr>Primitive</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Variables</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-module"><a href="xmcl_nbt.html#io-1" class="tsd-kind-icon">IO</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-module"><a href="xmcl_nbt.html#nbtconstructor" class="tsd-kind-icon">NBTConstructor</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-module"><a href="xmcl_nbt.html#nbtprototype-1" class="tsd-kind-icon">NBTPrototype</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Functions</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="xmcl_nbt.html#deserialize" class="tsd-kind-icon">deserialize</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="xmcl_nbt.html#deserializesync" class="tsd-kind-icon">deserialize<wbr>Sync</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_nbt.html#getprototypeof" class="tsd-kind-icon">get<wbr>Prototype<wbr>Of</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_nbt.html#serialize" class="tsd-kind-icon">serialize</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_nbt.html#serializesync" class="tsd-kind-icon">serialize<wbr>Sync</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_nbt.html#setprototypeof" class="tsd-kind-icon">set<wbr>Prototype<wbr>Of</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Type aliases</h2>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="compoundschema" class="tsd-anchor"></a>
+					<h3>Compound<wbr>Schema</h3>
+					<div class="tsd-signature tsd-kind-icon">Compound<wbr>Schema<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L178">packages/nbt/index.ts:178</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>key: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><a href="xmcl_nbt.html#tagtype-1" class="tsd-signature-type">TagType</a><span class="tsd-signature-symbol"> | </span><a href="xmcl_nbt.html#schema" class="tsd-signature-type">Schema</a></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="listschema" class="tsd-anchor"></a>
+					<h3>List<wbr>Schema</h3>
+					<div class="tsd-signature tsd-kind-icon">List<wbr>Schema<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">[</span><a href="xmcl_nbt.html#tagtype-1" class="tsd-signature-type">TagType</a><span class="tsd-signature-symbol"> | </span><a href="xmcl_nbt.html#schema" class="tsd-signature-type">Schema</a><span class="tsd-signature-symbol">]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L177">packages/nbt/index.ts:177</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="schema" class="tsd-anchor"></a>
+					<h3>Schema</h3>
+					<div class="tsd-signature tsd-kind-icon">Schema<span class="tsd-signature-symbol">:</span> <a href="xmcl_nbt.html#listschema" class="tsd-signature-type">ListSchema</a><span class="tsd-signature-symbol"> | </span><a href="xmcl_nbt.html#compoundschema" class="tsd-signature-type">CompoundSchema</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Constructor</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L176">packages/nbt/index.ts:176</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="tagtype-1" class="tsd-anchor"></a>
+					<h3>Tag<wbr>Type</h3>
+					<div class="tsd-signature tsd-kind-icon">Tag<wbr>Type<span class="tsd-signature-symbol">:</span> <a href="xmcl_nbt.html#tagtypeprimitive" class="tsd-signature-type">TagTypePrimitive</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#list" class="tsd-signature-type">List</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#compound" class="tsd-signature-type">Compound</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L18">packages/nbt/index.ts:18</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="tagtypeprimitive" class="tsd-anchor"></a>
+					<h3>Tag<wbr>Type<wbr>Primitive</h3>
+					<div class="tsd-signature tsd-kind-icon">Tag<wbr>Type<wbr>Primitive<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#end" class="tsd-signature-type">End</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#byte" class="tsd-signature-type">Byte</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#short" class="tsd-signature-type">Short</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#int" class="tsd-signature-type">Int</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#long" class="tsd-signature-type">Long</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#float" class="tsd-signature-type">Float</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#double" class="tsd-signature-type">Double</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#bytearray" class="tsd-signature-type">ByteArray</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#string" class="tsd-signature-type">String</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#intarray" class="tsd-signature-type">IntArray</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">typeof </span><a href="xmcl_nbt.tagtype.html#longarray" class="tsd-signature-type">LongArray</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L23">packages/nbt/index.ts:23</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module">
+					<a name="io-1" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> IO</h3>
+					<div class="tsd-signature tsd-kind-icon">IO<span class="tsd-signature-symbol">:</span> <a href="../interfaces/xmcl_nbt.io.html" class="tsd-signature-type">IO</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = [{ read: (buf) &#x3D;&gt; undefined, write(buf, v) { } }, // end{ read: (buf) &#x3D;&gt; buf.readByte(), write(buf, v &#x3D; 0) { buf.writeByte(v); } }, // byte{ read: (buf) &#x3D;&gt; buf.readShort(), write(buf, v &#x3D; 0) { buf.writeShort(v); } }, // short{ read: (buf) &#x3D;&gt; buf.readInt(), write(buf, v &#x3D; 0) { buf.writeInt(v); } }, // int{ read: (buf) &#x3D;&gt; buf.readInt64(), write(buf, v &#x3D; 0) { buf.writeInt64(v); } }, // long{ read: (buf) &#x3D;&gt; buf.readFloat(), write(buf, v &#x3D; 0) { buf.writeFloat(v); } }, // float{ read: (buf) &#x3D;&gt; buf.readDouble(), write(buf, v &#x3D; 0) { buf.writeDouble(v); } }, // double{ // byte arrayread(buf) {const arr &#x3D; new Array(buf.readInt());for (let i &#x3D; 0; i &lt; arr.length; i++) { arr[i] &#x3D; buf.readByte(); }return arr;},write(buf, arr &#x3D; []) {buf.writeInt(arr.length);for (let i &#x3D; 0; i &lt; arr.length; i++) { buf.writeByte(arr[i]); }},},{ read: (buf) &#x3D;&gt; readUTF8(buf), write: (buf, v &#x3D; &quot;&quot;) &#x3D;&gt; writeUTF8(buf, v) }, // string{ // listread(buf, context) {const listType &#x3D; buf.readByte();assertTag(listType);const len &#x3D; buf.readInt();const list &#x3D; new Array(len);if (context.schema) {assertListSchema(context.schema);}if (!!context.schema &amp;&amp; typeof context.schema &#x3D;&#x3D;&#x3D; &quot;number&quot; &amp;&amp; listType !&#x3D;&#x3D; context.schema) {// ignore the value if we know the type mismatchedreturn list;}const childContext &#x3D; context.fork(context.schema ? context.schema[0] : listType);const shouldInspectChildType &#x3D; !childContext.schema;for (let i &#x3D; 0; i &lt; len; i++) {// console.log(&#x60;[read] ${shouldInspectChildType ? &#x27;inspecting&#x27; : &#x27;&#x27;} -&gt; [${i}]: ${JSON.stringify(nextContext.valueType)} ${TagType.getName(listType)}&#x60;);list[i] &#x3D; IO[listType].read(buf, childContext);// console.log(&#x60;[read] ${shouldInspectChildType ? &#x27;inspecting&#x27; : &#x27;&#x27;} &lt;- [${i}]: ${JSON.stringify(nextContext.valueType)} ${TagType.getName(listType)} ${JSON.stringify(list[i])}&#x60;);}if (shouldInspectChildType) {context.inspect &#x3D; childContext.inspect || [childContext.tagType];}return list;},write(buf, value: any[] &#x3D; [], context) {assertListSchema(context.schema);const valueType &#x3D; context.schema[0];const childContext &#x3D; context.fork(valueType);const tagType &#x3D; childContext.tagType;const writer &#x3D; IO[tagType];assertTag(tagType);if ((tagType &#x3D;&#x3D;&#x3D; TagType.Compound || tagType &#x3D;&#x3D;&#x3D; TagType.List) &amp;&amp; !childContext.schema) {// skip for undefined propertyreturn;}try {buf.writeByte(tagType);buf.writeInt(value.length);for (const v of value) {writer.write(buf, v, childContext);}} catch (e) {if (e instanceof TypeError) {throw new TypeError(&#x60;Require ${TagType.getName(tagType)} but found ${typeof value}&#x60;);}}},},{// tag compoundread(buf, context) {assertCompoundSchema(context.schema);const object: any &#x3D; constructObject(context.schema); // create from constructorconst nbtPrototype &#x3D; getPrototypeOf(object);const knowingType &#x3D; !!context.schema;for (let tag &#x3D; 0; (tag &#x3D; buf.readByte()) !&#x3D;&#x3D; TagType.End;) {const reader &#x3D; IO[tag];const key &#x3D; readUTF8(buf);// not reader or illegal tag typeassertTag(tag);let childContext: ReadContext;if (knowingType) {const valueType &#x3D; nbtPrototype[key];// skip for undefined field or type not matched!if (typeof valueType &#x3D;&#x3D;&#x3D; &quot;undefined&quot; || (typeof valueType &#x3D;&#x3D;&#x3D; &quot;number&quot; &amp;&amp; valueType !&#x3D;&#x3D; tag)) {continue;}childContext &#x3D; context.fork(valueType);} else {childContext &#x3D; context.fork(tag);}const shouldInspectChildType &#x3D; !childContext.schema;// log(&#x60;[read] ${shouldInspectChildType ? &#x27;inspecting&#x27; : &#x27;&#x27;} -&gt; ${key}: ${JSON.stringify(childContext.schema)} ${TagType.getName(childContext.tagType)} ${TagType.getName(tag)}&#x60;);object[key] &#x3D; reader.read(buf, childContext);// log(&#x60;[read] ${shouldInspectChildType ? &#x27;inspecting&#x27; : &#x27;&#x27;} &lt;- ${key}: ${JSON.stringify(childContext.schema)} ${TagType.getName(childContext.tagType)} ${TagType.getName(tag)} ${JSON.stringify(object[key])}&#x60;);if (shouldInspectChildType) {nbtPrototype[key] &#x3D; childContext.inspect || childContext.tagType;}}if (!knowingType) {context.inspect &#x3D; nbtPrototype;}return object;},write(buf, object &#x3D; {}, context) {assertCompoundSchema(context.schema);const schema: CompoundSchema &#x3D; context.schema ? context.schema instanceof Function ? getPrototypeOf(context.schema) : context.schema : getPrototypeOf(object) as CompoundSchema;for (const [key, value] of Object.entries(object)) {const valueType &#x3D; schema[key];if (typeof valueType &#x3D;&#x3D;&#x3D; &quot;undefined&quot;) {// skip for undefined propertycontinue;}const childContext &#x3D; context.fork(valueType);const tagType &#x3D; childContext.tagType;const writer &#x3D; IO[tagType];assertTag(tagType);if (!childContext.schema &amp;&amp; (tagType &#x3D;&#x3D;&#x3D; TagType.Compound || tagType &#x3D;&#x3D;&#x3D; TagType.List)) {// skip for undefined propertycontinue;}// console.log(&#x60;Write ${key}: ${TagType.getName(tagType)} ${JSON.stringify(childContext.schema)} ${childContext.schema} ${childContext.schema instanceof Array}&#x60;)try {buf.writeByte(tagType);writeUTF8(buf, key);writer.write(buf, value, childContext);} catch (e) {if (e instanceof TypeError) {throw new TypeError(&#x60;Required ${TagType.getName(tagType)} but found ${typeof value}&#x60;);}}}buf.writeByte(TagType.End);},},{ // int arrayread(buf) {const arr &#x3D; new Array(buf.readInt());for (let i &#x3D; 0; i &lt; arr.length; i++) { arr[i] &#x3D; buf.readInt(); }return arr;},write(buf, v &#x3D; []) {buf.writeInt(v.length);for (let i &#x3D; 0; i &lt; v.length; i++) { buf.writeInt(v[i]); }},},{ // long arrayread(buf) {const len &#x3D; buf.readInt();const arr: Long[] &#x3D; new Array(len);for (let i &#x3D; 0; i &lt; len; i++) { arr[i] &#x3D; buf.readInt64(); }return arr;},write(buf, v &#x3D; []) {buf.writeInt(v.length);for (let i &#x3D; 0; i &lt; v.length; i++) { buf.writeInt64(v[i]); }},},]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L189">packages/nbt/index.ts:189</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module">
+					<a name="nbtconstructor" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> NBTConstructor</h3>
+					<div class="tsd-signature tsd-kind-icon">NBTConstructor<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> = Symbol(&quot;NBTConstructor&quot;)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L16">packages/nbt/index.ts:16</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module">
+					<a name="nbtprototype-1" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> NBTPrototype</h3>
+					<div class="tsd-signature tsd-kind-icon">NBTPrototype<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> = Symbol(&quot;NBTPrototype&quot;)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L15">packages/nbt/index.ts:15</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+					<a name="deserialize" class="tsd-anchor"></a>
+					<h3>deserialize</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">deserialize&lt;T&gt;<span class="tsd-signature-symbol">(</span>fileData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint8Array</span>, option<span class="tsd-signature-symbol">?: </span><a href="../interfaces/xmcl_nbt.deserializationoption.html" class="tsd-signature-type">DeserializationOption</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L410">packages/nbt/index.ts:410</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Deserialize the nbt binary into json</p>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T</h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fileData: <span class="tsd-signature-type">Uint8Array</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The nbt binary</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> option: <a href="../interfaces/xmcl_nbt.deserializationoption.html" class="tsd-signature-type">DeserializationOption</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = {}</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+					<a name="deserializesync" class="tsd-anchor"></a>
+					<h3>deserialize<wbr>Sync</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">deserialize<wbr>Sync&lt;T&gt;<span class="tsd-signature-symbol">(</span>fileData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint8Array</span>, option<span class="tsd-signature-symbol">?: </span><a href="../interfaces/xmcl_nbt.deserializationoption.html" class="tsd-signature-type">DeserializationOption</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L435">packages/nbt/index.ts:435</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Deserialize the nbt binary into json</p>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T</h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fileData: <span class="tsd-signature-type">Uint8Array</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The nbt binary</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> option: <a href="../interfaces/xmcl_nbt.deserializationoption.html" class="tsd-signature-type">DeserializationOption</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = {}</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="getprototypeof" class="tsd-anchor"></a>
+					<h3>get<wbr>Prototype<wbr>Of</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Prototype<wbr>Of<span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/xmcl_nbt.nbtprototype.html" class="tsd-signature-type">NBTPrototype</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L91">packages/nbt/index.ts:91</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get NBT schema for this object or a class.</p>
+								</div>
+								<p>If the param is a object, any modifications on this prototype will only affact this object.</p>
+								<p>If the param is a class, any modifications on this prototype will affact all object under this class</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>object: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Function</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The object or class</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/xmcl_nbt.nbtprototype.html" class="tsd-signature-type">NBTPrototype</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="serialize" class="tsd-anchor"></a>
+					<h3>serialize</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">serialize<span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span>, option<span class="tsd-signature-symbol">?: </span><a href="../interfaces/xmcl_nbt.serializationoption.html" class="tsd-signature-type">SerializationOption</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L401">packages/nbt/index.ts:401</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Serialzie an nbt typed json object into NBT binary</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>object: <span class="tsd-signature-type">object</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The json</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> option: <a href="../interfaces/xmcl_nbt.serializationoption.html" class="tsd-signature-type">SerializationOption</a><span class="tsd-signature-symbol"> = {}</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="serializesync" class="tsd-anchor"></a>
+					<h3>serialize<wbr>Sync</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">serialize<wbr>Sync<span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span>, option<span class="tsd-signature-symbol">?: </span><a href="../interfaces/xmcl_nbt.serializationoption.html" class="tsd-signature-type">SerializationOption</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint8Array</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L425">packages/nbt/index.ts:425</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Serialzie an nbt typed json object into NBT binary</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>object: <span class="tsd-signature-type">object</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The json</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> option: <a href="../interfaces/xmcl_nbt.serializationoption.html" class="tsd-signature-type">SerializationOption</a><span class="tsd-signature-symbol"> = {}</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Uint8Array</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="setprototypeof" class="tsd-anchor"></a>
+					<h3>set<wbr>Prototype<wbr>Of</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Prototype<wbr>Of<span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Function</span>, nbtPrototype<span class="tsd-signature-symbol">: </span><a href="../interfaces/xmcl_nbt.nbtprototype.html" class="tsd-signature-type">NBTPrototype</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/nbt/index.ts#L133">packages/nbt/index.ts:133</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Set and change the NBT prototype of this object or class</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>object: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Function</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A object or a class function</p>
+									</div>
+								</li>
+								<li>
+									<h5>nbtPrototype: <a href="../interfaces/xmcl_nbt.nbtprototype.html" class="tsd-signature-type">NBTPrototype</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The nbt prototype</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_asm.html">@xmcl/asm</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_client.html">@xmcl/client</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_core.html">@xmcl/core</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_curseforge.html">@xmcl/curseforge</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_forge_site_parser.html">@xmcl/forge-<wbr>site-<wbr>parser</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_gamesetting.html">@xmcl/gamesetting</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_installer.html">@xmcl/installer</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_mod_parser.html">@xmcl/mod-<wbr>parser</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_model.html">@xmcl/model</a>
+					</li>
+					<li class="current tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_nbt.html">@xmcl/nbt</a>
+						<ul>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module tsd-has-type-parameter">
+								<a href="xmcl_nbt.tagtype.html">Tag<wbr>Type</a>
+							</li>
+							<li class=" tsd-kind-module tsd-parent-kind-module">
+								<a href="xmcl_nbt.internal_zlib.html">internal/zlib</a>
+							</li>
+							<li class=" tsd-kind-module tsd-parent-kind-module">
+								<a href="xmcl_nbt.utils.html">utils</a>
+							</li>
+						</ul>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_resourcepack.html">@xmcl/resourcepack</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_server_info.html">@xmcl/server-<wbr>info</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_system.html">@xmcl/system</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_task.html">@xmcl/task</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_text_component.html">@xmcl/text-<wbr>component</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_unzip.html">@xmcl/unzip</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_user.html">@xmcl/user</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_world.html">@xmcl/world</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_nbt.readcontext.html" class="tsd-kind-icon">Read<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_nbt.writecontext.html" class="tsd-kind-icon">Write<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="../interfaces/xmcl_nbt.deserializationoption.html" class="tsd-kind-icon">Deserialization<wbr>Option</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/xmcl_nbt.io.html" class="tsd-kind-icon">IO</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/xmcl_nbt.nbtprototype.html" class="tsd-kind-icon">NBTPrototype</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/xmcl_nbt.serializationoption.html" class="tsd-kind-icon">Serialization<wbr>Option</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="xmcl_nbt.html#compoundschema" class="tsd-kind-icon">Compound<wbr>Schema</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="xmcl_nbt.html#listschema" class="tsd-kind-icon">List<wbr>Schema</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="xmcl_nbt.html#schema" class="tsd-kind-icon">Schema</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="xmcl_nbt.html#tagtype-1" class="tsd-kind-icon">Tag<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="xmcl_nbt.html#tagtypeprimitive" class="tsd-kind-icon">Tag<wbr>Type<wbr>Primitive</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module">
+						<a href="xmcl_nbt.html#io-1" class="tsd-kind-icon">IO</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module">
+						<a href="xmcl_nbt.html#nbtconstructor" class="tsd-kind-icon">NBTConstructor</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module">
+						<a href="xmcl_nbt.html#nbtprototype-1" class="tsd-kind-icon">NBTPrototype</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="xmcl_nbt.html#deserialize" class="tsd-kind-icon">deserialize</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="xmcl_nbt.html#deserializesync" class="tsd-kind-icon">deserialize<wbr>Sync</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_nbt.html#getprototypeof" class="tsd-kind-icon">get<wbr>Prototype<wbr>Of</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_nbt.html#serialize" class="tsd-kind-icon">serialize</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_nbt.html#serializesync" class="tsd-kind-icon">serialize<wbr>Sync</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_nbt.html#setprototypeof" class="tsd-kind-icon">set<wbr>Prototype<wbr>Of</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer>
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,644 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@xmcl/asm | minecraft-launcher-core-node - v0.1.1</title>
+	<meta name="description" content="Documentation for minecraft-launcher-core-node - v0.1.1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">minecraft-launcher-core-node - v0.1.1</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="xmcl_asm.html">@xmcl/asm</a>
+				</li>
+			</ul>
+			<h1>Module @xmcl/asm</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+						<h2>Usage</h2>
+					</a>
+					<a href="#ping-minecraft-server" id="ping-minecraft-server" style="color: inherit; text-decoration: none;">
+						<h3>Ping Minecraft Server</h3>
+					</a>
+					<p>The usage is just like asm library in java:</p>
+					<pre><code class="language-ts">    <span class="hljs-keyword">import</span> { AnnotationVisitor, ClassReader, ClassVisitor, MethodVisitor, Opcodes } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@xmcl/asm&#x27;</span>
+
+
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomClassVisitor</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ClassVisitor</span> </span>{
+        <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-title">constructor</span>(<span class="hljs-params"></span>)</span> {
+            <span class="hljs-built_in">super</span>(Opcodes.ASM5);
+        }
+
+        <span class="hljs-comment">// visit the class </span>
+        visit(version: <span class="hljs-built_in">number</span>, <span class="hljs-attr">access</span>: <span class="hljs-built_in">number</span>, <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">signature</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">superName</span>: <span class="hljs-built_in">string</span>, <span class="hljs-attr">interfaces</span>: <span class="hljs-built_in">string</span>[]): <span class="hljs-built_in">void</span> {
+        }
+
+        <span class="hljs-comment">// visit method</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-title">visitMethod</span>(<span class="hljs-params">access: <span class="hljs-built_in">number</span>, name: <span class="hljs-built_in">string</span>, desc: <span class="hljs-built_in">string</span>, signature: <span class="hljs-built_in">string</span>, exceptions: <span class="hljs-built_in">string</span>[]</span>)</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+        }
+
+        <span class="hljs-comment">// visit field</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-title">visitField</span>(<span class="hljs-params">access: <span class="hljs-built_in">number</span>, name: <span class="hljs-built_in">string</span>, desc: <span class="hljs-built_in">string</span>, signature: <span class="hljs-built_in">string</span>, value: <span class="hljs-built_in">any</span></span>)</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+        }
+    }
+
+    <span class="hljs-keyword">const</span> visitor = <span class="hljs-keyword">new</span> CustomClassVisitor();
+    <span class="hljs-keyword">const</span> classData: Buffer = <span class="hljs-keyword">await</span> fs.readFile(<span class="hljs-string">&quot;path/to/some.class&quot;</span>);
+    <span class="hljs-keyword">new</span> ClassReader(classData).accept(visitor);</code></pre>
+				</div>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>References</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_asm.html#annotationvisitor" class="tsd-kind-icon">Annotation<wbr>Visitor</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_asm.html#attribute" class="tsd-kind-icon">Attribute</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_asm.html#classreader" class="tsd-kind-icon">Class<wbr>Reader</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_asm.html#classvisitor" class="tsd-kind-icon">Class<wbr>Visitor</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_asm.html#fieldvisitor" class="tsd-kind-icon">Field<wbr>Visitor</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_asm.html#handle" class="tsd-kind-icon">Handle</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_asm.html#label" class="tsd-kind-icon">Label</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_asm.html#methodvisitor" class="tsd-kind-icon">Method<wbr>Visitor</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_asm.html#opcodes" class="tsd-kind-icon">Opcodes</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_asm.html#type" class="tsd-kind-icon">Type</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_asm.html#typepath" class="tsd-kind-icon">Type<wbr>Path</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_asm.html#typereference" class="tsd-kind-icon">Type<wbr>Reference</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Namespaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-namespace tsd-parent-kind-module"><a href="xmcl_asm.opcodes-1.html" class="tsd-kind-icon">Opcodes</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Classes</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.annotationvisitor-1.html" class="tsd-kind-icon">Annotation<wbr>Visitor</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.annotationwriter.html" class="tsd-kind-icon">Annotation<wbr>Writer</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.attribute-1.html" class="tsd-kind-icon">Attribute</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.bytevector.html" class="tsd-kind-icon">Byte<wbr>Vector</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.classreader-1.html" class="tsd-kind-icon">Class<wbr>Reader</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.classvisitor-1.html" class="tsd-kind-icon">Class<wbr>Visitor</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.classwriter.html" class="tsd-kind-icon">Class<wbr>Writer</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.context.html" class="tsd-kind-icon">Context</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.currentframe.html" class="tsd-kind-icon">Current<wbr>Frame</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.edge.html" class="tsd-kind-icon">Edge</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.fieldvisitor-1.html" class="tsd-kind-icon">Field<wbr>Visitor</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.fieldwriter.html" class="tsd-kind-icon">Field<wbr>Writer</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.frame.html" class="tsd-kind-icon">Frame</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.handle-1.html" class="tsd-kind-icon">Handle</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.item.html" class="tsd-kind-icon">Item</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.label-1.html" class="tsd-kind-icon">Label</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.methodvisitor-1.html" class="tsd-kind-icon">Method<wbr>Visitor</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.methodwriter.html" class="tsd-kind-icon">Method<wbr>Writer</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.type-1.html" class="tsd-kind-icon">Type</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.typepath-1.html" class="tsd-kind-icon">Type<wbr>Path</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_asm.typereference-1.html" class="tsd-kind-icon">Type<wbr>Reference</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Variables</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-module"><a href="xmcl_asm.html#short_max" class="tsd-kind-icon">SHORT_<wbr>MAX</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-module"><a href="xmcl_asm.html#short_min" class="tsd-kind-icon">SHORT_<wbr>MIN</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Functions</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="xmcl_asm.html#assert" class="tsd-kind-icon">assert</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_asm.html#doubletolongbits" class="tsd-kind-icon">double<wbr>ToLong<wbr>Bits</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_asm.html#floattointbits" class="tsd-kind-icon">float<wbr>ToInt<wbr>Bits</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_asm.html#intbitstofloat" class="tsd-kind-icon">int<wbr>Bits<wbr>ToFloat</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_asm.html#longbitstodouble" class="tsd-kind-icon">long<wbr>Bits<wbr>ToDouble</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="xmcl_asm.html#notnull" class="tsd-kind-icon">notnull</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>References</h2>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="annotationvisitor" class="tsd-anchor"></a>
+					<h3>Annotation<wbr>Visitor</h3>
+					Re-exports <a href="../classes/xmcl_asm.annotationvisitor-1.html">AnnotationVisitor</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="attribute" class="tsd-anchor"></a>
+					<h3>Attribute</h3>
+					Re-exports <a href="../classes/xmcl_asm.attribute-1.html">Attribute</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="classreader" class="tsd-anchor"></a>
+					<h3>Class<wbr>Reader</h3>
+					Re-exports <a href="../classes/xmcl_asm.classreader-1.html">ClassReader</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="classvisitor" class="tsd-anchor"></a>
+					<h3>Class<wbr>Visitor</h3>
+					Re-exports <a href="../classes/xmcl_asm.classvisitor-1.html">ClassVisitor</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="fieldvisitor" class="tsd-anchor"></a>
+					<h3>Field<wbr>Visitor</h3>
+					Re-exports <a href="../classes/xmcl_asm.fieldvisitor-1.html">FieldVisitor</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="handle" class="tsd-anchor"></a>
+					<h3>Handle</h3>
+					Re-exports <a href="../classes/xmcl_asm.handle-1.html">Handle</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="label" class="tsd-anchor"></a>
+					<h3>Label</h3>
+					Re-exports <a href="../classes/xmcl_asm.label-1.html">Label</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="methodvisitor" class="tsd-anchor"></a>
+					<h3>Method<wbr>Visitor</h3>
+					Re-exports <a href="../classes/xmcl_asm.methodvisitor-1.html">MethodVisitor</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="opcodes" class="tsd-anchor"></a>
+					<h3>Opcodes</h3>
+					Re-exports <a href="xmcl_asm.opcodes-1.html">Opcodes</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="type" class="tsd-anchor"></a>
+					<h3>Type</h3>
+					Re-exports <a href="../classes/xmcl_asm.type-1.html">Type</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="typepath" class="tsd-anchor"></a>
+					<h3>Type<wbr>Path</h3>
+					Re-exports <a href="../classes/xmcl_asm.typepath-1.html">TypePath</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="typereference" class="tsd-anchor"></a>
+					<h3>Type<wbr>Reference</h3>
+					Re-exports <a href="../classes/xmcl_asm.typereference-1.html">TypeReference</a>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module">
+					<a name="short_max" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> SHORT_<wbr>MAX</h3>
+					<div class="tsd-signature tsd-kind-icon">SHORT_<wbr>MAX<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">32768</span><span class="tsd-signature-symbol"> = 32768</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/asm/libs/bits.ts#L6">packages/asm/libs/bits.ts:6</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module">
+					<a name="short_min" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> SHORT_<wbr>MIN</h3>
+					<div class="tsd-signature tsd-kind-icon">SHORT_<wbr>MIN<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">-32768</span><span class="tsd-signature-symbol"> = -32768</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/asm/libs/bits.ts#L5">packages/asm/libs/bits.ts:5</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+					<a name="assert" class="tsd-anchor"></a>
+					<h3>assert</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">assert&lt;T&gt;<span class="tsd-signature-symbol">(</span>v<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">asserts</span><span class="tsd-signature-type">v</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type">T</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/asm/libs/utils.ts#L1">packages/asm/libs/utils.ts:1</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T</h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>v: <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">asserts</span><span class="tsd-signature-type">v</span><span class="tsd-signature-symbol"> is </span><span class="tsd-signature-type">T</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="doubletolongbits" class="tsd-anchor"></a>
+					<h3>double<wbr>ToLong<wbr>Bits</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">double<wbr>ToLong<wbr>Bits<span class="tsd-signature-symbol">(</span>double<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Long</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/asm/libs/bits.ts#L30">packages/asm/libs/bits.ts:30</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>double: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Long</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="floattointbits" class="tsd-anchor"></a>
+					<h3>float<wbr>ToInt<wbr>Bits</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">float<wbr>ToInt<wbr>Bits<span class="tsd-signature-symbol">(</span>bits<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/asm/libs/bits.ts#L13">packages/asm/libs/bits.ts:13</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>bits: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="intbitstofloat" class="tsd-anchor"></a>
+					<h3>int<wbr>Bits<wbr>ToFloat</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">int<wbr>Bits<wbr>ToFloat<span class="tsd-signature-symbol">(</span>bits<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/asm/libs/bits.ts#L8">packages/asm/libs/bits.ts:8</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>bits: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="longbitstodouble" class="tsd-anchor"></a>
+					<h3>long<wbr>Bits<wbr>ToDouble</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">long<wbr>Bits<wbr>ToDouble<span class="tsd-signature-symbol">(</span>bits<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Long</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/asm/libs/bits.ts#L24">packages/asm/libs/bits.ts:24</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>bits: <span class="tsd-signature-type">Long</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+					<a name="notnull" class="tsd-anchor"></a>
+					<h3>notnull</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">notnull&lt;T&gt;<span class="tsd-signature-symbol">(</span>v<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/asm/libs/utils.ts#L5">packages/asm/libs/utils.ts:5</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T</h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>v: <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="xmcl_asm.html">@xmcl/asm</a>
+						<ul>
+							<li class=" tsd-kind-namespace tsd-parent-kind-module">
+								<a href="xmcl_asm.opcodes-1.html">Opcodes</a>
+							</li>
+						</ul>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_client.html">@xmcl/client</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_core.html">@xmcl/core</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_curseforge.html">@xmcl/curseforge</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_forge_site_parser.html">@xmcl/forge-<wbr>site-<wbr>parser</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_gamesetting.html">@xmcl/gamesetting</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_installer.html">@xmcl/installer</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_mod_parser.html">@xmcl/mod-<wbr>parser</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_model.html">@xmcl/model</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_nbt.html">@xmcl/nbt</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_resourcepack.html">@xmcl/resourcepack</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_server_info.html">@xmcl/server-<wbr>info</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_system.html">@xmcl/system</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_task.html">@xmcl/task</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_text_component.html">@xmcl/text-<wbr>component</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_unzip.html">@xmcl/unzip</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_user.html">@xmcl/user</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_world.html">@xmcl/world</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_asm.html#annotationvisitor" class="tsd-kind-icon">Annotation<wbr>Visitor</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_asm.html#attribute" class="tsd-kind-icon">Attribute</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_asm.html#classreader" class="tsd-kind-icon">Class<wbr>Reader</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_asm.html#classvisitor" class="tsd-kind-icon">Class<wbr>Visitor</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_asm.html#fieldvisitor" class="tsd-kind-icon">Field<wbr>Visitor</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_asm.html#handle" class="tsd-kind-icon">Handle</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_asm.html#label" class="tsd-kind-icon">Label</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_asm.html#methodvisitor" class="tsd-kind-icon">Method<wbr>Visitor</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_asm.html#opcodes" class="tsd-kind-icon">Opcodes</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_asm.html#type" class="tsd-kind-icon">Type</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_asm.html#typepath" class="tsd-kind-icon">Type<wbr>Path</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_asm.html#typereference" class="tsd-kind-icon">Type<wbr>Reference</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.annotationvisitor-1.html" class="tsd-kind-icon">Annotation<wbr>Visitor</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.annotationwriter.html" class="tsd-kind-icon">Annotation<wbr>Writer</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.attribute-1.html" class="tsd-kind-icon">Attribute</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.bytevector.html" class="tsd-kind-icon">Byte<wbr>Vector</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.classreader-1.html" class="tsd-kind-icon">Class<wbr>Reader</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.classvisitor-1.html" class="tsd-kind-icon">Class<wbr>Visitor</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.classwriter.html" class="tsd-kind-icon">Class<wbr>Writer</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.context.html" class="tsd-kind-icon">Context</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.currentframe.html" class="tsd-kind-icon">Current<wbr>Frame</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.edge.html" class="tsd-kind-icon">Edge</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.fieldvisitor-1.html" class="tsd-kind-icon">Field<wbr>Visitor</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.fieldwriter.html" class="tsd-kind-icon">Field<wbr>Writer</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.frame.html" class="tsd-kind-icon">Frame</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.handle-1.html" class="tsd-kind-icon">Handle</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.item.html" class="tsd-kind-icon">Item</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.label-1.html" class="tsd-kind-icon">Label</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.methodvisitor-1.html" class="tsd-kind-icon">Method<wbr>Visitor</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.methodwriter.html" class="tsd-kind-icon">Method<wbr>Writer</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.type-1.html" class="tsd-kind-icon">Type</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.typepath-1.html" class="tsd-kind-icon">Type<wbr>Path</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_asm.typereference-1.html" class="tsd-kind-icon">Type<wbr>Reference</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module">
+						<a href="xmcl_asm.html#short_max" class="tsd-kind-icon">SHORT_<wbr>MAX</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module">
+						<a href="xmcl_asm.html#short_min" class="tsd-kind-icon">SHORT_<wbr>MIN</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="xmcl_asm.html#assert" class="tsd-kind-icon">assert</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_asm.html#doubletolongbits" class="tsd-kind-icon">double<wbr>ToLong<wbr>Bits</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_asm.html#floattointbits" class="tsd-kind-icon">float<wbr>ToInt<wbr>Bits</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_asm.html#intbitstofloat" class="tsd-kind-icon">int<wbr>Bits<wbr>ToFloat</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_asm.html#longbitstodouble" class="tsd-kind-icon">long<wbr>Bits<wbr>ToDouble</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="xmcl_asm.html#notnull" class="tsd-kind-icon">notnull</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer>
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,655 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>auth | minecraft-launcher-core-node - v0.1.1</title>
+	<meta name="description" content="Documentation for minecraft-launcher-core-node - v0.1.1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">minecraft-launcher-core-node - v0.1.1</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="xmcl_user.html">@xmcl/user</a>
+				</li>
+				<li>
+					<a href="xmcl_user.auth.html">auth</a>
+				</li>
+			</ul>
+			<h1>Module auth</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Classes</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/xmcl_user.auth.authenticator.html" class="tsd-kind-icon">Authenticator</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Interfaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/xmcl_user.auth.authexception.html" class="tsd-kind-icon">Auth<wbr>Exception</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/xmcl_user.auth.authentication.html" class="tsd-kind-icon">Authentication</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html" class="tsd-kind-icon">Yggdrasil<wbr>AuthAPI</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Functions</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_user.auth.html#invalidate" class="tsd-kind-icon">invalidate</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_user.auth.html#login" class="tsd-kind-icon">login</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_user.auth.html#newtoken" class="tsd-kind-icon">new<wbr>Token</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_user.auth.html#offline" class="tsd-kind-icon">offline</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_user.auth.html#refresh" class="tsd-kind-icon">refresh</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_user.auth.html#signout" class="tsd-kind-icon">signout</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_user.auth.html#v5" class="tsd-kind-icon">v5</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="xmcl_user.auth.html#validate" class="tsd-kind-icon">validate</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Object literals</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-object-literal tsd-parent-kind-module"><a href="xmcl_user.auth.html#auth_api_mojang" class="tsd-kind-icon">AUTH_<wbr>API_<wbr>MOJANG</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="invalidate" class="tsd-anchor"></a>
+					<h3>invalidate</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">invalidate<span class="tsd-signature-symbol">(</span>option<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>accessToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>clientToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span>, api<span class="tsd-signature-symbol">?: </span><a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html" class="tsd-signature-type">YggdrasilAuthAPI</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L278">packages/user/auth.ts:278</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Invalidate an access/client token pair</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>option: <span class="tsd-signature-symbol">{ </span>accessToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>clientToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The tokens</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>access<wbr>Token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>client<wbr>Token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> api: <a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html" class="tsd-signature-type">YggdrasilAuthAPI</a><span class="tsd-signature-symbol"> = AUTH_API_MOJANG</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The API of the auth server</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="login" class="tsd-anchor"></a>
+					<h3>login</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">login<span class="tsd-signature-symbol">(</span>option<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">LoginOption</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">{ </span>clientToken<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span>, api<span class="tsd-signature-symbol">?: </span><a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html" class="tsd-signature-type">YggdrasilAuthAPI</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/xmcl_user.auth.authentication.html" class="tsd-signature-type">Authentication</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L237">packages/user/auth.ts:237</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Login to the server by username and password. Notice that the auth server usually have the cooldown time for login.
+									You have to wait for about a minute after one approch of login, to login again.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>This may throw the error object with <code>statusCode</code>, <code>statusMessage</code>, <code>type</code> (error type), and <code>message</code></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>option: <span class="tsd-signature-type">LoginOption</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">{ </span>clientToken<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The login options, contains the username, password and clientToken</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> api: <a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html" class="tsd-signature-type">YggdrasilAuthAPI</a><span class="tsd-signature-symbol"> = AUTH_API_MOJANG</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The API of the auth server</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/xmcl_user.auth.authentication.html" class="tsd-signature-type">Authentication</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="newtoken" class="tsd-anchor"></a>
+					<h3>new<wbr>Token</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">new<wbr>Token<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L76">packages/user/auth.ts:76</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Random generate a new token by uuid v4. It can be client or auth token.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>a new token</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="offline" class="tsd-anchor"></a>
+					<h3>offline</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">offline<span class="tsd-signature-symbol">(</span>username<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/xmcl_user.auth.authentication.html" class="tsd-signature-type">Authentication</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L302">packages/user/auth.ts:302</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Create an offline auth. It&#39;ll ensure the user game profile&#39;s <code>uuid</code> is the same for the same <code>username</code>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>username: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The username you want to have in-game.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/xmcl_user.auth.authentication.html" class="tsd-signature-type">Authentication</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="refresh" class="tsd-anchor"></a>
+					<h3>refresh</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">refresh<span class="tsd-signature-symbol">(</span>option<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>accessToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>clientToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>requestUser<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> }</span>, api<span class="tsd-signature-symbol">?: </span><a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html" class="tsd-signature-type">YggdrasilAuthAPI</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/xmcl_user.auth.authentication.html" class="tsd-signature-type">Authentication</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">"accessToken"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"clientToken"</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L250">packages/user/auth.ts:250</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Refresh the current access token with specific client token.
+									Notice that the client token and access token must match.</p>
+								</div>
+								<p>You can use this function to get a new token when your old token is expired.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>option: <span class="tsd-signature-symbol">{ </span>accessToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>clientToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>requestUser<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> }</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The tokens</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>access<wbr>Token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>client<wbr>Token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5><span class="tsd-flag ts-flagOptional">Optional</span> request<wbr>User<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></h5>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> api: <a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html" class="tsd-signature-type">YggdrasilAuthAPI</a><span class="tsd-signature-symbol"> = AUTH_API_MOJANG</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The API of the auth server</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/xmcl_user.auth.authentication.html" class="tsd-signature-type">Authentication</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">"accessToken"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"clientToken"</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="signout" class="tsd-anchor"></a>
+					<h3>signout</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">signout<span class="tsd-signature-symbol">(</span>option<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>password<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>username<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span>, api<span class="tsd-signature-symbol">?: </span><a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html" class="tsd-signature-type">YggdrasilAuthAPI</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L290">packages/user/auth.ts:290</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Signout user by username and password</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>option: <span class="tsd-signature-symbol">{ </span>password<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>username<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The username and password</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>password<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>username<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> api: <a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html" class="tsd-signature-type">YggdrasilAuthAPI</a><span class="tsd-signature-symbol"> = AUTH_API_MOJANG</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The API of the auth server</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="v5" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> v5</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">v5<span class="tsd-signature-symbol">(</span>s<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L7">packages/user/auth.ts:7</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>s: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="validate" class="tsd-anchor"></a>
+					<h3>validate</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">validate<span class="tsd-signature-symbol">(</span>option<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>accessToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>clientToken<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span>, api<span class="tsd-signature-symbol">?: </span><a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html" class="tsd-signature-type">YggdrasilAuthAPI</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L259">packages/user/auth.ts:259</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Determine whether the access/client token pair is valid.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>option: <span class="tsd-signature-symbol">{ </span>accessToken<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>clientToken<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The tokens</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>access<wbr>Token<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5><span class="tsd-flag ts-flagOptional">Optional</span> client<wbr>Token<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> api: <a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html" class="tsd-signature-type">YggdrasilAuthAPI</a><span class="tsd-signature-symbol"> = AUTH_API_MOJANG</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The API of the auth server</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Object literals</h2>
+				<section class="tsd-panel tsd-member tsd-kind-object-literal tsd-parent-kind-module">
+					<a name="auth_api_mojang" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> AUTH_<wbr>API_<wbr>MOJANG</h3>
+					<div class="tsd-signature tsd-kind-icon">AUTH_<wbr>API_<wbr>MOJANG<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L184">packages/user/auth.ts:184</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The default Mojang API</p>
+						</div>
+					</div>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="auth_api_mojang.authenticate" class="tsd-anchor"></a>
+						<h3>authenticate</h3>
+						<div class="tsd-signature tsd-kind-icon">authenticate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;/authenticate&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L186">packages/user/auth.ts:186</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="auth_api_mojang.hostname" class="tsd-anchor"></a>
+						<h3>host<wbr>Name</h3>
+						<div class="tsd-signature tsd-kind-icon">host<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;https://authserver.mojang.com&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L185">packages/user/auth.ts:185</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="auth_api_mojang.invalidate-1" class="tsd-anchor"></a>
+						<h3>invalidate</h3>
+						<div class="tsd-signature tsd-kind-icon">invalidate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;/invalidate&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L189">packages/user/auth.ts:189</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="auth_api_mojang.refresh-1" class="tsd-anchor"></a>
+						<h3>refresh</h3>
+						<div class="tsd-signature tsd-kind-icon">refresh<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;/refresh&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L187">packages/user/auth.ts:187</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="auth_api_mojang.signout-1" class="tsd-anchor"></a>
+						<h3>signout</h3>
+						<div class="tsd-signature tsd-kind-icon">signout<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;/signout&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L190">packages/user/auth.ts:190</a></li>
+							</ul>
+						</aside>
+					</section>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="auth_api_mojang.validate-1" class="tsd-anchor"></a>
+						<h3>validate</h3>
+						<div class="tsd-signature tsd-kind-icon">validate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;/validate&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/Voxelum/minecraft-launcher-core-node/blob/af26256/packages/user/auth.ts#L188">packages/user/auth.ts:188</a></li>
+							</ul>
+						</aside>
+					</section>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_asm.html">@xmcl/asm</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_client.html">@xmcl/client</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_core.html">@xmcl/core</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_curseforge.html">@xmcl/curseforge</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_forge_site_parser.html">@xmcl/forge-<wbr>site-<wbr>parser</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_gamesetting.html">@xmcl/gamesetting</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_installer.html">@xmcl/installer</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_mod_parser.html">@xmcl/mod-<wbr>parser</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_model.html">@xmcl/model</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_nbt.html">@xmcl/nbt</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_resourcepack.html">@xmcl/resourcepack</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_server_info.html">@xmcl/server-<wbr>info</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_system.html">@xmcl/system</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_task.html">@xmcl/task</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_text_component.html">@xmcl/text-<wbr>component</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_unzip.html">@xmcl/unzip</a>
+					</li>
+					<li class="current tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_user.html">@xmcl/user</a>
+						<ul>
+							<li class="current tsd-kind-module tsd-parent-kind-module">
+								<a href="xmcl_user.auth.html">auth</a>
+							</li>
+							<li class=" tsd-kind-module tsd-parent-kind-module">
+								<a href="xmcl_user.base.html">base</a>
+							</li>
+							<li class=" tsd-kind-module tsd-parent-kind-module">
+								<a href="xmcl_user.internal_util.html">internal/util</a>
+							</li>
+							<li class=" tsd-kind-module tsd-parent-kind-module tsd-is-external">
+								<a href="xmcl_user.internal_v5.html">internal/v5</a>
+							</li>
+							<li class=" tsd-kind-module tsd-parent-kind-module">
+								<a href="xmcl_user.mojang.html">mojang</a>
+							</li>
+							<li class=" tsd-kind-module tsd-parent-kind-module">
+								<a href="xmcl_user.service.html">service</a>
+							</li>
+						</ul>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_world.html">@xmcl/world</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/xmcl_user.auth.authenticator.html" class="tsd-kind-icon">Authenticator</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/xmcl_user.auth.authexception.html" class="tsd-kind-icon">Auth<wbr>Exception</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/xmcl_user.auth.authentication.html" class="tsd-kind-icon">Authentication</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html" class="tsd-kind-icon">Yggdrasil<wbr>AuthAPI</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_user.auth.html#invalidate" class="tsd-kind-icon">invalidate</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_user.auth.html#login" class="tsd-kind-icon">login</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_user.auth.html#newtoken" class="tsd-kind-icon">new<wbr>Token</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_user.auth.html#offline" class="tsd-kind-icon">offline</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_user.auth.html#refresh" class="tsd-kind-icon">refresh</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_user.auth.html#signout" class="tsd-kind-icon">signout</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_user.auth.html#v5" class="tsd-kind-icon">v5</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="xmcl_user.auth.html#validate" class="tsd-kind-icon">validate</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-module">
+						<a href="xmcl_user.auth.html#auth_api_mojang" class="tsd-kind-icon">AUTH_<wbr>API_<wbr>MOJANG</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer>
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

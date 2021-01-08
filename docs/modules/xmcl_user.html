@@ -1,0 +1,581 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@xmcl/user | minecraft-launcher-core-node - v0.1.1</title>
+	<meta name="description" content="Documentation for minecraft-launcher-core-node - v0.1.1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">minecraft-launcher-core-node - v0.1.1</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="xmcl_user.html">@xmcl/user</a>
+				</li>
+			</ul>
+			<h1>Module @xmcl/user</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+						<h2>Usage</h2>
+					</a>
+					<a href="#user-login-officialoffline" id="user-login-officialoffline" style="color: inherit; text-decoration: none;">
+						<h3>User Login (Official/Offline)</h3>
+					</a>
+					<p>You can do official or offline login:</p>
+					<pre><code class="language-ts">    <span class="hljs-keyword">import</span> { login, offline, Authentication } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@xmcl/user&quot;</span>;
+    <span class="hljs-keyword">const</span> username: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> password: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> authFromMojang: Authentication = <span class="hljs-keyword">await</span> login({ username, password }); <span class="hljs-comment">// official login</span>
+    <span class="hljs-keyword">const</span> authOffline: Authentication = offline(username); <span class="hljs-comment">// offline login</span>
+
+    <span class="hljs-keyword">const</span> accessToken: <span class="hljs-built_in">string</span> = authFromMojang.accessToken;</code></pre>
+					<p>Validate/Refresh/Invalidate access token. This is majorly used for reduce user login and login again.</p>
+					<pre><code class="language-ts">    <span class="hljs-keyword">import</span> { validate, refresh } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@xmcl/user&quot;</span>;
+    <span class="hljs-keyword">const</span> accessToken: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> clientToken: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> valid: <span class="hljs-built_in">boolean</span> = <span class="hljs-keyword">await</span> validate({ accessToken, clientToken });
+    <span class="hljs-keyword">if</span> (!valid) {
+        <span class="hljs-keyword">const</span> newAuth: Auth = <span class="hljs-keyword">await</span> refresh({ accessToken, clientToken });
+    }
+    <span class="hljs-keyword">await</span> invalidate({ accessToken, clientToken });</code></pre>
+					<p>Use third party Yggdrasil API to auth:</p>
+					<pre><code class="language-ts">    <span class="hljs-keyword">import</span> { login, YggdrasilAuthAPI } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@xmcl/user&quot;</span>;
+    <span class="hljs-keyword">const</span> username: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> password: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> yourAPI: YggdrasilAuthAPI;
+    <span class="hljs-keyword">const</span> authFromMojang = <span class="hljs-keyword">await</span> login({ username, password }, yourAPI); <span class="hljs-comment">// official login</span></code></pre>
+					<a href="#user-skin-operation" id="user-skin-operation" style="color: inherit; text-decoration: none;">
+						<h3>User Skin Operation</h3>
+					</a>
+					<p>Or lookup profile by name:</p>
+					<pre><code class="language-ts">    <span class="hljs-keyword">import</span> { lookupByName, GameProfile } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@xmcl/user&quot;</span>;
+
+    <span class="hljs-keyword">const</span> username: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> gameProfile: GameProfile = <span class="hljs-keyword">await</span> lookupByName(username);</code></pre>
+					<p>Fetch the user game profile by uuid. (This could also be used for get skin)</p>
+					<pre><code class="language-ts">    <span class="hljs-keyword">import</span> { lookup, GameProfile } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@xmcl/user&quot;</span>;
+    <span class="hljs-keyword">const</span> userUUID: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> gameProfile: GameProfile = <span class="hljs-keyword">await</span> lookup(userUUID);</code></pre>
+					<p>Get player skin:</p>
+					<pre><code class="language-ts">    <span class="hljs-keyword">import</span> { lookup, GameProfile, getTextures } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@xmcl/user&quot;</span>;
+    <span class="hljs-keyword">const</span> userUUID: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> gameProfile: GameProfile = <span class="hljs-keyword">await</span> lookup(userUUID);
+    <span class="hljs-keyword">const</span> infos: GameProfile.TexturesInfo | <span class="hljs-literal">undefined</span> = getTextures(gameProfile);
+    <span class="hljs-keyword">const</span> skin: GameProfile.Texture = infos!.textures.SKIN!;
+    <span class="hljs-keyword">const</span> skinUrl: <span class="hljs-built_in">string</span> = skin.url; <span class="hljs-comment">// use url to display skin</span>
+    <span class="hljs-keyword">const</span> isSlim: <span class="hljs-built_in">boolean</span> = GameProfile.Texture.isSlim(skin); <span class="hljs-comment">// determine if model is slim or not</span></code></pre>
+					<p>Set player skin from URL:</p>
+					<pre><code class="language-ts">    <span class="hljs-keyword">import</span> { lookup, GameProfile, setTexture } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@xmcl/user&quot;</span>;
+    <span class="hljs-keyword">const</span> userUUID: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> userAccessToken: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> userNewSkinUrl: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">await</span> setTexture({
+        <span class="hljs-attr">accessToken</span>: userAccessToken,
+        <span class="hljs-attr">uuid</span>: userUUID,
+        <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;skin&quot;</span>,
+        <span class="hljs-attr">texture</span>: {
+            <span class="hljs-attr">url</span>: userNewSkinUrl,
+            <span class="hljs-attr">metadata</span>: { <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;slim&quot;</span> }, 
+            <span class="hljs-comment">// suppose this model is a slim model</span>
+            <span class="hljs-comment">// if this model is a normal model, this should be steve</span>
+        }
+    });</code></pre>
+					<p>Set player skin from binary (read file file):</p>
+					<pre><code class="language-ts">    <span class="hljs-keyword">import</span> { lookup, GameProfile, setTexture } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@xmcl/user&quot;</span>;
+    <span class="hljs-keyword">const</span> userUUID: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> userAccessToken: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> userNewSkinData: <span class="hljs-built_in">Uint8Array</span>; 
+    <span class="hljs-comment">// in nodejs this can be a `Buffer` from file</span>
+    <span class="hljs-comment">// in browser this can come from a `Blob`</span>
+    <span class="hljs-keyword">await</span> setTexture({
+        <span class="hljs-attr">accessToken</span>: userAccessToken,
+        <span class="hljs-attr">uuid</span>: userUUID,
+        <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;skin&quot;</span>,
+        <span class="hljs-attr">texture</span>: {
+            <span class="hljs-attr">data</span>: userNewSkinData,
+            <span class="hljs-attr">metadata</span>: { <span class="hljs-attr">model</span>: <span class="hljs-string">&quot;steve&quot;</span> }, 
+        }
+    });</code></pre>
+					<p>Delete player skin (reset to default):</p>
+					<pre><code class="language-ts">    <span class="hljs-keyword">import</span> { lookup, GameProfile, setTexture } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@xmcl/user&quot;</span>;
+    <span class="hljs-keyword">const</span> userUUID: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> userAccessToken: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">await</span> setTexture({
+        <span class="hljs-attr">accessToken</span>: userAccessToken,
+        <span class="hljs-attr">uuid</span>: userUUID,
+        <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;skin&quot;</span>,
+    });</code></pre>
+					<a href="#mojang-security-api" id="mojang-security-api" style="color: inherit; text-decoration: none;">
+						<h3>Mojang Security API</h3>
+					</a>
+					<p>Validate if user have a validated IP address, and get &amp; answer challenges to validate player&#39;s identity.</p>
+					<pre><code class="language-ts">    <span class="hljs-keyword">import</span> { checkLocation, getChallenges, responseChallenges } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@xmcl/user&quot;</span>;
+    <span class="hljs-keyword">const</span> accessToken: <span class="hljs-built_in">string</span>;
+    <span class="hljs-keyword">const</span> validIp: <span class="hljs-built_in">boolean</span> = <span class="hljs-keyword">await</span> checkLocation(accessToken);
+
+    <span class="hljs-keyword">if</span> (!validIp) {
+        <span class="hljs-keyword">const</span> challenges: MojangChallenge[] = <span class="hljs-keyword">await</span> getChallenges(accessToken);
+        <span class="hljs-comment">// after your answer the challenges</span>
+        <span class="hljs-keyword">const</span> responses: MojangChallengeResponse[];
+        <span class="hljs-keyword">await</span> responseChallenges(accessToken, responses);
+    }</code></pre>
+				</div>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>References</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#auth_api_mojang" class="tsd-kind-icon">AUTH_<wbr>API_<wbr>MOJANG</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#authexception" class="tsd-kind-icon">Auth<wbr>Exception</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#authentication" class="tsd-kind-icon">Authentication</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#authenticator" class="tsd-kind-icon">Authenticator</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#gameprofile" class="tsd-kind-icon">Game<wbr>Profile</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#gameprofilewithproperties" class="tsd-kind-icon">Game<wbr>Profile<wbr>With<wbr>Properties</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#mojangchallenge" class="tsd-kind-icon">Mojang<wbr>Challenge</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#mojangchallengeresponse" class="tsd-kind-icon">Mojang<wbr>Challenge<wbr>Response</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#profile_api_mojang" class="tsd-kind-icon">PROFILE_<wbr>API_<wbr>MOJANG</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#profilelookupexception" class="tsd-kind-icon">Profile<wbr>Lookup<wbr>Exception</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#profilelookuper" class="tsd-kind-icon">Profile<wbr>Lookuper</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#profileserviceapi" class="tsd-kind-icon">Profile<wbr>ServiceAPI</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#settextureoption" class="tsd-kind-icon">Set<wbr>Texture<wbr>Option</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#yggdrasilauthapi" class="tsd-kind-icon">Yggdrasil<wbr>AuthAPI</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#checklocation" class="tsd-kind-icon">check<wbr>Location</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#getchallenges" class="tsd-kind-icon">get<wbr>Challenges</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#gettextures" class="tsd-kind-icon">get<wbr>Textures</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#invalidate" class="tsd-kind-icon">invalidate</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#login" class="tsd-kind-icon">login</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#lookup" class="tsd-kind-icon">lookup</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#lookupbyname" class="tsd-kind-icon">lookup<wbr>ByName</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#newtoken" class="tsd-kind-icon">new<wbr>Token</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#offline" class="tsd-kind-icon">offline</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#refresh" class="tsd-kind-icon">refresh</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#responsechallenges" class="tsd-kind-icon">response<wbr>Challenges</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#settexture" class="tsd-kind-icon">set<wbr>Texture</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#signout" class="tsd-kind-icon">signout</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#v5" class="tsd-kind-icon">v5</a></li>
+								<li class="tsd-kind-reference tsd-parent-kind-module"><a href="xmcl_user.html#validate" class="tsd-kind-icon">validate</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Modules</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-module tsd-parent-kind-module"><a href="xmcl_user.auth.html" class="tsd-kind-icon">auth</a></li>
+								<li class="tsd-kind-module tsd-parent-kind-module"><a href="xmcl_user.base.html" class="tsd-kind-icon">base</a></li>
+								<li class="tsd-kind-module tsd-parent-kind-module"><a href="xmcl_user.internal_util.html" class="tsd-kind-icon">internal/util</a></li>
+								<li class="tsd-kind-module tsd-parent-kind-module tsd-is-external"><a href="xmcl_user.internal_v5.html" class="tsd-kind-icon">internal/v5</a></li>
+								<li class="tsd-kind-module tsd-parent-kind-module"><a href="xmcl_user.mojang.html" class="tsd-kind-icon">mojang</a></li>
+								<li class="tsd-kind-module tsd-parent-kind-module"><a href="xmcl_user.service.html" class="tsd-kind-icon">service</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>References</h2>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="auth_api_mojang" class="tsd-anchor"></a>
+					<h3>AUTH_<wbr>API_<wbr>MOJANG</h3>
+					Re-exports <a href="xmcl_user.auth.html#auth_api_mojang">AUTH_API_MOJANG</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="authexception" class="tsd-anchor"></a>
+					<h3>Auth<wbr>Exception</h3>
+					Re-exports <a href="../interfaces/xmcl_user.auth.authexception.html">AuthException</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="authentication" class="tsd-anchor"></a>
+					<h3>Authentication</h3>
+					Re-exports <a href="../interfaces/xmcl_user.auth.authentication.html">Authentication</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="authenticator" class="tsd-anchor"></a>
+					<h3>Authenticator</h3>
+					Re-exports <a href="../classes/xmcl_user.auth.authenticator.html">Authenticator</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="gameprofile" class="tsd-anchor"></a>
+					<h3>Game<wbr>Profile</h3>
+					Re-exports <a href="xmcl_user.base.gameprofile.html">GameProfile</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="gameprofilewithproperties" class="tsd-anchor"></a>
+					<h3>Game<wbr>Profile<wbr>With<wbr>Properties</h3>
+					Re-exports <a href="../interfaces/xmcl_user.base.gameprofilewithproperties.html">GameProfileWithProperties</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="mojangchallenge" class="tsd-anchor"></a>
+					<h3>Mojang<wbr>Challenge</h3>
+					Re-exports <a href="../interfaces/xmcl_user.mojang.mojangchallenge.html">MojangChallenge</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="mojangchallengeresponse" class="tsd-anchor"></a>
+					<h3>Mojang<wbr>Challenge<wbr>Response</h3>
+					Re-exports <a href="../interfaces/xmcl_user.mojang.mojangchallengeresponse.html">MojangChallengeResponse</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="profile_api_mojang" class="tsd-anchor"></a>
+					<h3>PROFILE_<wbr>API_<wbr>MOJANG</h3>
+					Re-exports <a href="xmcl_user.service.html#profile_api_mojang">PROFILE_API_MOJANG</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="profilelookupexception" class="tsd-anchor"></a>
+					<h3>Profile<wbr>Lookup<wbr>Exception</h3>
+					Re-exports <a href="../interfaces/xmcl_user.service.profilelookupexception.html">ProfileLookupException</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="profilelookuper" class="tsd-anchor"></a>
+					<h3>Profile<wbr>Lookuper</h3>
+					Re-exports <a href="../classes/xmcl_user.service.profilelookuper.html">ProfileLookuper</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="profileserviceapi" class="tsd-anchor"></a>
+					<h3>Profile<wbr>ServiceAPI</h3>
+					Re-exports <a href="xmcl_user.service.profileserviceapi.html">ProfileServiceAPI</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="settextureoption" class="tsd-anchor"></a>
+					<h3>Set<wbr>Texture<wbr>Option</h3>
+					Re-exports <a href="../interfaces/xmcl_user.service.settextureoption.html">SetTextureOption</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="yggdrasilauthapi" class="tsd-anchor"></a>
+					<h3>Yggdrasil<wbr>AuthAPI</h3>
+					Re-exports <a href="../interfaces/xmcl_user.auth.yggdrasilauthapi.html">YggdrasilAuthAPI</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="checklocation" class="tsd-anchor"></a>
+					<h3>check<wbr>Location</h3>
+					Re-exports <a href="xmcl_user.mojang.html#checklocation">checkLocation</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="getchallenges" class="tsd-anchor"></a>
+					<h3>get<wbr>Challenges</h3>
+					Re-exports <a href="xmcl_user.mojang.html#getchallenges">getChallenges</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="gettextures" class="tsd-anchor"></a>
+					<h3>get<wbr>Textures</h3>
+					Re-exports <a href="xmcl_user.service.html#gettextures">getTextures</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="invalidate" class="tsd-anchor"></a>
+					<h3>invalidate</h3>
+					Re-exports <a href="xmcl_user.auth.html#invalidate">invalidate</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="login" class="tsd-anchor"></a>
+					<h3>login</h3>
+					Re-exports <a href="xmcl_user.auth.html#login">login</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="lookup" class="tsd-anchor"></a>
+					<h3>lookup</h3>
+					Re-exports <a href="xmcl_user.service.html#lookup">lookup</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="lookupbyname" class="tsd-anchor"></a>
+					<h3>lookup<wbr>ByName</h3>
+					Re-exports <a href="xmcl_user.service.html#lookupbyname">lookupByName</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="newtoken" class="tsd-anchor"></a>
+					<h3>new<wbr>Token</h3>
+					Re-exports <a href="xmcl_user.auth.html#newtoken">newToken</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="offline" class="tsd-anchor"></a>
+					<h3>offline</h3>
+					Re-exports <a href="xmcl_user.auth.html#offline">offline</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="refresh" class="tsd-anchor"></a>
+					<h3>refresh</h3>
+					Re-exports <a href="xmcl_user.auth.html#refresh">refresh</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="responsechallenges" class="tsd-anchor"></a>
+					<h3>response<wbr>Challenges</h3>
+					Re-exports <a href="xmcl_user.mojang.html#responsechallenges">responseChallenges</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="settexture" class="tsd-anchor"></a>
+					<h3>set<wbr>Texture</h3>
+					Re-exports <a href="xmcl_user.service.html#settexture">setTexture</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="signout" class="tsd-anchor"></a>
+					<h3>signout</h3>
+					Re-exports <a href="xmcl_user.auth.html#signout">signout</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="v5" class="tsd-anchor"></a>
+					<h3>v5</h3>
+					Re-exports <a href="xmcl_user.auth.html#v5">v5</a>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-reference tsd-parent-kind-module">
+					<a name="validate" class="tsd-anchor"></a>
+					<h3>validate</h3>
+					Re-exports <a href="xmcl_user.auth.html#validate">validate</a>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_asm.html">@xmcl/asm</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_client.html">@xmcl/client</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_core.html">@xmcl/core</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_curseforge.html">@xmcl/curseforge</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_forge_site_parser.html">@xmcl/forge-<wbr>site-<wbr>parser</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_gamesetting.html">@xmcl/gamesetting</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_installer.html">@xmcl/installer</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_mod_parser.html">@xmcl/mod-<wbr>parser</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_model.html">@xmcl/model</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_nbt.html">@xmcl/nbt</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_resourcepack.html">@xmcl/resourcepack</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_server_info.html">@xmcl/server-<wbr>info</a>
+					</li>
+					<li class=" tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_system.html">@xmcl/system</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_task.html">@xmcl/task</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_text_component.html">@xmcl/text-<wbr>component</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_unzip.html">@xmcl/unzip</a>
+					</li>
+					<li class="current tsd-kind-module tsd-is-not-exported">
+						<a href="xmcl_user.html">@xmcl/user</a>
+						<ul>
+							<li class=" tsd-kind-module tsd-parent-kind-module">
+								<a href="xmcl_user.auth.html">auth</a>
+							</li>
+							<li class=" tsd-kind-module tsd-parent-kind-module">
+								<a href="xmcl_user.base.html">base</a>
+							</li>
+							<li class=" tsd-kind-module tsd-parent-kind-module">
+								<a href="xmcl_user.internal_util.html">internal/util</a>
+							</li>
+							<li class=" tsd-kind-module tsd-parent-kind-module tsd-is-external">
+								<a href="xmcl_user.internal_v5.html">internal/v5</a>
+							</li>
+							<li class=" tsd-kind-module tsd-parent-kind-module">
+								<a href="xmcl_user.mojang.html">mojang</a>
+							</li>
+							<li class=" tsd-kind-module tsd-parent-kind-module">
+								<a href="xmcl_user.service.html">service</a>
+							</li>
+						</ul>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="xmcl_world.html">@xmcl/world</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#auth_api_mojang" class="tsd-kind-icon">AUTH_<wbr>API_<wbr>MOJANG</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#authexception" class="tsd-kind-icon">Auth<wbr>Exception</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#authentication" class="tsd-kind-icon">Authentication</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#authenticator" class="tsd-kind-icon">Authenticator</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#gameprofile" class="tsd-kind-icon">Game<wbr>Profile</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#gameprofilewithproperties" class="tsd-kind-icon">Game<wbr>Profile<wbr>With<wbr>Properties</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#mojangchallenge" class="tsd-kind-icon">Mojang<wbr>Challenge</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#mojangchallengeresponse" class="tsd-kind-icon">Mojang<wbr>Challenge<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#profile_api_mojang" class="tsd-kind-icon">PROFILE_<wbr>API_<wbr>MOJANG</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#profilelookupexception" class="tsd-kind-icon">Profile<wbr>Lookup<wbr>Exception</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#profilelookuper" class="tsd-kind-icon">Profile<wbr>Lookuper</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#profileserviceapi" class="tsd-kind-icon">Profile<wbr>ServiceAPI</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#settextureoption" class="tsd-kind-icon">Set<wbr>Texture<wbr>Option</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#yggdrasilauthapi" class="tsd-kind-icon">Yggdrasil<wbr>AuthAPI</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#checklocation" class="tsd-kind-icon">check<wbr>Location</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#getchallenges" class="tsd-kind-icon">get<wbr>Challenges</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#gettextures" class="tsd-kind-icon">get<wbr>Textures</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#invalidate" class="tsd-kind-icon">invalidate</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#login" class="tsd-kind-icon">login</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#lookup" class="tsd-kind-icon">lookup</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#lookupbyname" class="tsd-kind-icon">lookup<wbr>ByName</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#newtoken" class="tsd-kind-icon">new<wbr>Token</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#offline" class="tsd-kind-icon">offline</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#refresh" class="tsd-kind-icon">refresh</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#responsechallenges" class="tsd-kind-icon">response<wbr>Challenges</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#settexture" class="tsd-kind-icon">set<wbr>Texture</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#signout" class="tsd-kind-icon">signout</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#v5" class="tsd-kind-icon">v5</a>
+					</li>
+					<li class=" tsd-kind-reference tsd-parent-kind-module">
+						<a href="xmcl_user.html#validate" class="tsd-kind-icon">validate</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer>
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
