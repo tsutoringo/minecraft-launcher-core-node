@@ -94,7 +94,7 @@ export function parse(content: string): ForgeWebPage {
 
                 const mdk = links.find((l) => l.name === "mdk");
 
-                if (installer === undefined || universal === undefined) {
+                if (installer === undefined && universal === undefined) {
                     throw new Error("Cannot parse forge web since it missing installer and universal jar info.");
                 }
                 const result = {
@@ -132,9 +132,9 @@ interface Version {
      * The changelog info
      */
     changelog?: Download;
-    installer: Download;
+    installer?: Download;
     mdk?: Download;
-    universal: Download;
+    universal?: Download;
     source?: Download;
     launcher?: Download;
 
